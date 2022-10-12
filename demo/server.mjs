@@ -1,14 +1,14 @@
 import polka from 'polka'
 import chalk from 'chalk'
+import sirv from 'sirv'
 
-module.exports = function serve(options) {
+function serve(options) {
     const app = polka()
-        .use(require("sirv")(options.o))
-        .use(redirect)
+        .use(sirv(options.o))
         .get("/", async (req, res) => {
-            const App = await import('./entry')
-            const html = renderToString(App)
-            res.end(html)
+            // const App = await import('./entry')
+            // const html = renderToString(App)
+            res.end('ok')
         })
         .listen(1234, (err) => {
             if (err) throw err
@@ -16,3 +16,4 @@ module.exports = function serve(options) {
         })
     return app.server
 }
+serve({ o: './dist' })
