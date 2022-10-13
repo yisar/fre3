@@ -1,6 +1,7 @@
 const TEXT_NODE = 3
 const EMPTY_OBJ = {}
 const EMPTY_ARR = []
+const isArray = Array.isArray
 
 export const h = function (tag, props) {
   for (var vnode, rest = [], children = [], i = arguments.length; i-- > 2;) {
@@ -22,19 +23,18 @@ export const h = function (tag, props) {
 
   return typeof tag === "function"
     ? tag(props, children)
-    : createVNode(tag, props, children, null, props.key)
+    : createVNode(tag, props, children, props.key)
 }
 
-const createTextVNode = function (value, node) {
-  return createVNode(value, EMPTY_OBJ, EMPTY_ARR, node, null, TEXT_NODE)
+const createTextVNode = function (value) {
+  return createVNode(value, EMPTY_OBJ, EMPTY_ARR, null, TEXT_NODE)
 }
 
-const createVNode = function (tag, props, children, node, key, type) {
+const createVNode = function (tag, props, children, key, type) {
   return {
     tag,
     props,
     children,
-    node,
     type,
     key
   }

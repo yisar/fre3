@@ -1,4 +1,22 @@
 {
+  "name": "snel",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "node ./demo/server.mjs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yisar/snel.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/yisar/snel/issues"
+  },
+  "homepage": "https://github.com/yisar/snel#readme",
   "dependencies": {
     "chalk": "^5.1.1",
     "polka": "^0.5.2",

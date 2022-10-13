@@ -1,14 +1,16 @@
 import polka from 'polka'
 import chalk from 'chalk'
 import sirv from 'sirv'
+import { renderToString } from '../src/renderToString.mjs'
 
 function serve(options) {
     const app = polka()
         .use(sirv(options.o))
         .get("/", async (req, res) => {
-            // const App = await import('./entry')
-            // const html = renderToString(App)
-            res.end('ok')
+            const module = await import('./app.mjs')
+            const html = renderToString(module.view(module.state))
+            console.log(html)
+            res.end(html)
         })
         .listen(1234, (err) => {
             if (err) throw err
