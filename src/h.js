@@ -1,37 +1,41 @@
-export const h = (type, props, ...kids) => {
-  props = props || {}
-  kids = flat(arrayfy(props.children || kids))
+const TEXT_NODE = 3
+const EMPTY_OBJ = {}
+const EMPTY_ARR = []
 
-  if (kids.length) props.children = kids.length === 1 ? kids[0] : kids
+export const h = function (tag, props) {
+  for (var vnode, rest = [], children = [], i = arguments.length; i-- > 2;) {
+    rest.push(arguments[i])
+  }
 
-  const key = props.key || null
-  const ref = props.ref || null
+  while (rest.length > 0) {
+    if (isArray((vnode = rest.pop()))) {
+      for (var i = vnode.length; i-- > 0;) {
+        rest.push(vnode[i])
+      }
+    } else if (vnode === false || vnode === true || vnode == null) {
+    } else {
+      children.push(typeof vnode === "object" ? vnode : createTextVNode(vnode))
+    }
+  }
 
-  if (key) props.key = undefined
-  if (ref) props.ref = undefined
+  props = props || EMPTY_OBJ
 
-  return createVnode(type, props, key, ref)
+  return typeof tag === "function"
+    ? tag(props, children)
+    : createVNode(tag, props, children, null, props.key)
 }
 
-const some = (x) => x != null && x !== true && x !== false
-
-const flat = (arr, target = []) => {
-  arr.forEach(v => {
-    isArr(v)
-      ? flat(v, target)
-      : some(v) && target.push(isStr(v) ? createText(v) : v)
-  })
-  return target
+const createTextVNode = function (value, node) {
+  return createVNode(value, EMPTY_OBJ, EMPTY_ARR, node, null, TEXT_NODE)
 }
 
-export const createVnode = (type, props, key, ref) => ({
-  type,
-  props,
-  key,
-  ref,
-})
-
-export const createText = (vnode) =>
-  ({ type: '#text', props: { nodeValue: vnode + '' } })
-
-export const isArr = Array.isArray
+const createVNode = function (tag, props, children, node, key, type) {
+  return {
+    tag,
+    props,
+    children,
+    node,
+    type,
+    key
+  }
+}
