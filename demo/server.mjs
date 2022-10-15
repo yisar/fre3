@@ -9,8 +9,12 @@ function serve(options) {
         .get("/", async (req, res) => {
             const module = await import('./app.mjs')
             const html = renderToString(module.view(module.state))
-            console.log(html)
-            res.end(html)
+            const str = `
+            <script>
+            window.__state = ${JSON.stringify(module.state)}
+            </script>
+          <script type="module" src="./runtime.js"></script></script><body>${html}</body>`
+            res.end(str)
         })
         .listen(1234, (err) => {
             if (err) throw err
