@@ -1,5 +1,6 @@
 pub mod lexer;
 pub mod parser;
+pub mod generator;
 
 fn main() {
     // println!("Hello, world!");
@@ -7,10 +8,10 @@ fn main() {
         return <div><h1>hello world</h1></div>
     }";
     let mut p = parser::Parser::new(str);
-    let root = p.parse_all();
+    let root = p.parse_all().unwrap();
     // println!("{:#?}", lexer.tokens)
     // let mut out = old_parser::parse(str.to_string());
-    println!("{:#?}", root)
+    let mut g = generator::Generator::new(root);
 
 
 }

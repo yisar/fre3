@@ -8,8 +8,9 @@ enum Actions {
     ReadingCloseTag,
 }
 
-#[derive(PartialEq, Debug)]
+#[derive(PartialEq, Debug, Clone)]
 pub struct Node {
+    pub kind: usize,
     pub tag: String,
     pub children: Vec<Node>,
     pub props: HashMap<String, Option<String>>,
@@ -18,6 +19,7 @@ pub struct Node {
 impl Node {
     fn new(tag: String) -> Node {
         Node {
+            kind: 0,
             tag,
             children: Vec::new(),
             props: HashMap::new(),
@@ -59,7 +61,6 @@ impl Parser {
                     match &token {
                         Token::OpenTag(s) => {
                             state.push(Actions::ReadingOpenTag);
-                            // let last_idx_parsed = parsed.len() - 1;
                             let mut node = Node::new(s.to_string());
                             idx += 1;
 
@@ -72,6 +73,21 @@ impl Parser {
                             }
                             parsed.push(node);
                             idx += readed;
+                        }
+
+                        Token::AttributeKey(k) => {
+                            //todo
+                            idx += 1;
+                        }
+
+                        Token::AttributeValue(k) => {
+                            //todo
+                            idx += 1;
+                        }
+
+                        Token::SelfCloseTag(k) => {
+                            //todo
+                            idx += 1;
                         }
 
                         Token::CloseTag(s) => {
