@@ -49,7 +49,6 @@ impl Parser {
     }
 
     pub fn parse_schild(&mut self, mut slice_tokens: Vec<Token>) -> (Vec<Node>, usize) {
-        let mut child_nodes: Vec<Token> = vec![];
         let mut idx = 0;
         let mut state: Vec<Actions> = vec![];
         let mut parsed: Vec<Node> = vec![];
@@ -57,25 +56,28 @@ impl Parser {
         loop {
             if let Some(last_state) = state.last().clone() {
                 if let Some(token) = slice_tokens.get_mut(idx) {
-                    match token {
+                    match &token {
                         Token::OpenTag(s) => {
                             state.push(Actions::ReadingOpenTag);
+                            // let last_idx_parsed = parsed.len() - 1;
+                            let mut node = Node::new(s.to_string());
                             idx += 1;
+
+                            let tokens = slice_tokens[idx..].to_vec();
+
+                            let (childs, readed) = self.parse_schild(tokens);
+
+                            for child in childs {
+                                node.children.push(child)
+                            }
+                            parsed.push(node);
+                            idx += readed;
                         }
 
                         Token::CloseTag(s) => {
-                            if last_state == &Actions::ReadingOpenTag {
-                                let last_idx_parsed = parsed.len() - 1;
-                                idx += 1;
-                                let tokens = slice_tokens[idx..].to_vec();
-                                println!("{:#?}", tokens);
-                                let (childs, idx) = self.parse_schild(tokens);
-                                for child in childs {
-                                    parsed[last_idx_parsed].children.push(child)
-                                }
-                            }
                             state.push(Actions::ReadingCloseTag);
                             idx += 1;
+                            break (parsed, idx);
                         }
                         Token::Text(t) => {
                             idx += 1;
@@ -85,12 +87,10 @@ impl Parser {
 
                         _ => {
                             idx += 1;
-                            child_nodes.push(token.clone());
                         }
                     }
                 } else {
                     let node = Node::new("\n".to_string());
-                    println!("{:#?}", 111);
                     break (parsed, idx);
                 }
             } else {

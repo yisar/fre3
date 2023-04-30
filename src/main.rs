@@ -4,7 +4,7 @@ pub mod parser;
 fn main() {
     // println!("Hello, world!");
     let str = "function App(){
-        return <div>hello world</div>
+        return <div><h1>hello world</h1></div>
     }";
     let mut p = parser::Parser::new(str);
     let root = p.parse_all();
