@@ -109,10 +109,13 @@ impl Parser {
                         break (parsed, idx, props);
                     }
                     Token::Text(t) => {
+                        if self.reading {
+                            self.reading = false;
+                            break (parsed, idx, props);
+                        }
                         idx += 1;
-                        
+
                         let mut n = Node::new(t.to_string());
-                        // println!("{}", t.get_mut(0));
                         n.kind = 2;
                         parsed.push(n);
                     }

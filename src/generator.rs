@@ -32,9 +32,13 @@ impl Generator {
         match node.kind {
             2 => code = format!("{}{}", code, node.tag),
             1 => {
-                let jsx_out = self.generate_jsx(node);
-                let pre = self.generate_prelude();
-                code = format!("(()=>{{{}{}{}return f1;}})()", pre, code, jsx_out)
+                if node.tag.chars().nth(0).unwrap().is_uppercase() {
+                    code = format!("{}{}()", code, node.tag)
+                } else {
+                    let jsx_out = self.generate_jsx(node);
+                    let pre = self.generate_prelude();
+                    code = format!("(()=>{{{}{}{}return f1;}})()", pre, code, jsx_out)
+                }
             }
             _ => {}
         }
