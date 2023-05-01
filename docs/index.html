@@ -91,6 +91,11 @@
                 plugins: [parserBabel],
             })
         }
+
+        function exec(code){
+            document.querySelector('.app').innerHTML = ''
+            eval(code)
+        }
         init().then(() => {
             const input = document.querySelector('.editor');
             const output = document.querySelector('.output');
@@ -101,12 +106,12 @@
 document.querySelector('.app').appendChild(<App/>)`;
             let oo = format(compile(input.value))
             output.textContent = oo;
-            eval(oo)
+            exec(oo)
             input.oninput = (e) => {
                 const i = e.target.value
                 const o = format(compile(input.value))
                 output.textContent = o;
-                eval(o)
+                exec(o)
             }
         })
     </script>
