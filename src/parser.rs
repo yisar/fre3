@@ -65,6 +65,7 @@ impl Parser {
                             node.children.push(child)
                         }
                         node.props = props;
+                        node.kind = 1;
                         parsed.push(node);
                         idx += readed;
                     }
@@ -91,7 +92,8 @@ impl Parser {
                     }
                     Token::Text(t) => {
                         idx += 1;
-                        let n = Node::new(t.to_string());
+                        let mut n = Node::new(t.to_string());
+                        n.kind = 2;
                         parsed.push(n);
                     }
 

@@ -16,17 +16,13 @@ impl Generator {
     }
 
     pub fn generate(&mut self) -> String {
-        let mut create = "".to_string();
-        let mut update = "".to_string();
-        let mut distory = "".to_string();
 
         let node = self.root.clone();
 
         for child in node.children {
             let out = self.generate_node(child);
-            create = out.0;
-            update = out.1;
-            distory = out.2;
+            println!("{}", out)
+
         }
 
         let mut prelude = "let ".to_string() + &self.get_element("0".to_string());
@@ -45,13 +41,41 @@ impl Generator {
         );
     }
 
-    pub fn generate_node(&mut self, node: Node) -> (String, String, String) {
-        let mut create = "".to_string();
-        let mut update = "".to_string();
-        let mut distory = "".to_string();
-        self.next += 1;
+    pub fn generate_node(&mut self, node: Node) -> String {
+        let mut code = "".to_string();
+        match node.kind {
+            2 => code = format!("{}{}", code, node.tag),
+            1 => {
+                let jsx_out = self.generate_jsx(node);
+                code = format!("{}{}", code, jsx_out)
+                // element
+            }
+            _ => {}
+        }
 
-        return ("".to_string(), "".to_string(), "".to_string());
+        return code;
+    }
+
+    pub fn generate_jsx(&mut self, node: Node) -> String {
+        let code = "".to_string();
+        match node.kind {
+            2 => {
+                // code = format!("{}{}", code, node.tag);
+                self.next += 1;
+                let text_id = self.next.to_string();
+                let text_code = self.set_text_content(text_id, node.tag);
+                return code;
+            }
+            1 => {
+                // self.next+=1;
+                // code = format!("{}{}", code, node.tag);
+                // let mut jsx_out = self.generate_jsx(node);
+                
+                // element
+            }
+            _ => {}
+        }
+        return code;
     }
 }
 
