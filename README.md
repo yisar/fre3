@@ -2,6 +2,8 @@
 
 > 临时仓库，五一放假临时写一写
 
+- [Playground](https://yisar.github.io/fre3/)
+
 input:
 
 ```js
