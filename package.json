@@ -1,0 +1,24 @@
+{
+  "name": "fre",
+  "version": "3.0.0-alpha",
+  "description": "> 临时仓库，五一放假临时写一写",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "demo": "serve ./demo/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yisar/fre3.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/yisar/fre3/issues"
+  },
+  "homepage": "https://github.com/yisar/fre3#readme",
+  "dependencies": {
+    "serve": "^14.2.0"
+  }
+}

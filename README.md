@@ -6,7 +6,10 @@ input:
 
 ```js
 function App(){
-    return <div><h1>hello world</h1></div>
+    const count = signal(0)
+    return <button onclick={() => count(count() + 1)}>
+        {count()}
+    </button>
 }
 
 document.body.appendChild(<App/>)
@@ -15,12 +18,14 @@ output:
 
 ```js
 function App() {
+    const count = signal(0)
     return (() => {
-        let f0, f1, f2; 
-        f1 = f.createElement('div'); 
-        f2 = f.createElement('h1'); 
-        f.setTextContent(f2, 'hello world');
-        f.appendChild(f1, f2)
+        let f0, f1; 
+        f1 = f.createElement('button');
+        f1.addEventListener('click', () =>count(count() + 1))
+        computed(() => { // autorun
+            f.setTextContent(f2, count());
+        });
         return f1;
     })()
 }
@@ -48,4 +53,6 @@ solidjs 比 svelte 做的最大的一个优化，就是先一次性 innerHTML，
 
 fre3 使用手写的编译器，而不是 babel，这是完全可行的，但就无法利用 babel 的生态了就是
 
+2. No Proxy
 
+Proxy 的解构是个致命缺陷，很多 js 引擎也不支持 Proxy（如 hermes），fre3 使用闭包来做到细粒度响应式，不需要 Proxy
