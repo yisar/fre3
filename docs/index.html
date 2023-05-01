@@ -94,8 +94,7 @@
         init().then(() => {
             const input = document.querySelector('.editor');
             const output = document.querySelector('.output');
-            input.value = `
-function App(){
+            input.value = `function App(){
         const count = f.signal(0)
         return <button onclick={()=>count(count()+1)}>{count()}</button>
     }
