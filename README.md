@@ -23,7 +23,7 @@ function App() {
         let f0, f1; 
         f1 = f.createElement('button');
         f1.addEventListener('click', () =>count(count() + 1))
-        computed(() => { // autorun
+        computed(() => { // 是闭包！不是 Proxy!
             f.setTextContent(f2, count());
         });
         return f1;
