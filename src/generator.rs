@@ -98,16 +98,16 @@ impl Generator {
     }
 
     pub fn crate_element(&mut self, tag: String) -> String {
-        return format!("f.ce({});", tag);
+        return format!("f.ce('{}');", tag);
     }
 
     pub fn crate_text_node(&mut self, tag: String) -> String {
-        return format!("f.ctn({});", tag);
+        return format!("f.ctn('{}');", tag);
     }
 
     pub fn set_attrbute(&mut self, atribute: (String, String), element: String) -> String {
         return format!(
-            "f.sa({},\"{}\",\"{}\");",
+            "f.sa({},'{}','{}');",
             self.get_element(element),
             atribute.0,
             atribute.1
@@ -116,7 +116,7 @@ impl Generator {
 
     pub fn add_event(&mut self, element: String, key: String, handler: String) -> String {
         return format!(
-            "f.ael({},\"{}\",\"{}\");",
+            "f.ael({},'{}','{}');",
             self.get_element(element),
             key,
             handler
@@ -129,7 +129,7 @@ impl Generator {
 
     pub fn append_child(&mut self, parent: String, element: String) -> String {
         return format!(
-            "f.ac({},\"{}\");",
+            "f.ac({},'{}');",
             self.get_element(element),
             self.get_element(parent)
         );
@@ -137,7 +137,7 @@ impl Generator {
 
     pub fn remove_child(&mut self, parent: String, element: String) -> String {
         return format!(
-            "f.rc({},\"{}\");",
+            "f.rc({},'{}');",
             self.get_element(element),
             self.get_element(parent)
         );
