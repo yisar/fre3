@@ -14,6 +14,6 @@ fn main() {
     // println!("{:#?}", p.lexer.tokens);
     // println!("{:#?}", root);
     let mut g = generator::Generator::new(root.clone());
-    let mut out = g.generate();
+    let out = g.generate();
     println!("{:#?}", out)
 }
