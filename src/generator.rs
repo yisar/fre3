@@ -16,29 +16,15 @@ impl Generator {
     }
 
     pub fn generate(&mut self) -> String {
-
         let node = self.root.clone();
+        let mut code = "".to_string();
 
         for child in node.children {
             let out = self.generate_node(child);
-            println!("{}", out)
-
+            code = format!("{}{}", code, out);
         }
 
-        let mut prelude = "let ".to_string() + &self.get_element("0".to_string());
-
-        let mut x = 1;
-
-        while x < self.next {
-            prelude = format!("{},{}", prelude, self.get_element(x.to_string()));
-            x += 1;
-        }
-
-        return format!(
-            "{};return [function($){{{},",
-            prelude,
-            self.set_element("0".to_string(), "$".to_string())
-        );
+        return code;
     }
 
     pub fn generate_node(&mut self, node: Node) -> String {
@@ -47,8 +33,8 @@ impl Generator {
             2 => code = format!("{}{}", code, node.tag),
             1 => {
                 let jsx_out = self.generate_jsx(node);
-                code = format!("{}{}", code, jsx_out)
-                // element
+                let pre = self.generate_prelude();
+                code = format!("(()=>{{{}{}{}}})()", pre, code, jsx_out)
             }
             _ => {}
         }
@@ -56,21 +42,44 @@ impl Generator {
         return code;
     }
 
+    pub fn generate_prelude(&mut self) -> String {
+        let mut prelude = "let f0".to_string();
+
+        let mut x = 1;
+
+        while x <= self.next {
+            prelude = format!("{},{}", prelude, self.get_element(x.to_string()));
+            x += 1;
+        }
+
+        return format!("{};", prelude);
+    }
+
     pub fn generate_jsx(&mut self, node: Node) -> String {
-        let code = "".to_string();
+        let mut code = "".to_string();
         match node.kind {
             2 => {
-                // code = format!("{}{}", code, node.tag);
-                self.next += 1;
                 let text_id = self.next.to_string();
                 let text_code = self.set_text_content(text_id, node.tag);
+                code = format!("{}{}", code, text_code);
                 return code;
             }
             1 => {
-                // self.next+=1;
-                // code = format!("{}{}", code, node.tag);
+                self.next += 1;
+                let element_id = self.next.to_string();
+                let element_code = self.crate_element(node.tag);
+                let create_code = self.set_element(element_id, element_code);
+
+                code = format!("{}{}", code, create_code);
+
+                for child in node.children {
+                    let child_code = self.generate_jsx(child);
+                    code = format!("{}{}", code, child_code);
+                }
+
+                return code;
                 // let mut jsx_out = self.generate_jsx(node);
-                
+
                 // element
             }
             _ => {}
@@ -81,19 +90,19 @@ impl Generator {
 
 impl Generator {
     pub fn get_element(&mut self, element: String) -> String {
-        return "f".to_string() + &element;
+        return format!("{}{}", "f", &element);
     }
 
     pub fn set_element(&mut self, element: String, code: String) -> String {
-        return self.get_element(element) + "=" + &code;
+        return format!("{}={}", self.get_element(element), code);
     }
 
     pub fn crate_element(&mut self, tag: String) -> String {
-        return "f.ce".to_string() + "(" + &tag + ")";
+        return format!("f.ce({});", tag);
     }
 
     pub fn crate_text_node(&mut self, tag: String) -> String {
-        return "f.ctn".to_string() + "(" + &tag + ")";
+        return format!("f.ctn({});", tag);
     }
 
     pub fn set_attrbute(&mut self, atribute: (String, String), element: String) -> String {
@@ -115,7 +124,7 @@ impl Generator {
     }
 
     pub fn set_text_content(&mut self, element: String, content: String) -> String {
-        return format!("f.stc({},\"{}\");", self.get_element(element), content);
+        return format!("f.stc({},'{}');", self.get_element(element), content);
     }
 
     pub fn append_child(&mut self, parent: String, element: String) -> String {
