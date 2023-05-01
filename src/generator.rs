@@ -34,7 +34,7 @@ impl Generator {
             1 => {
                 let jsx_out = self.generate_jsx(node);
                 let pre = self.generate_prelude();
-                code = format!("(()=>{{{}{}{}}})()", pre, code, jsx_out)
+                code = format!("(()=>{{{}{}{}return f1;}})()", pre, code, jsx_out)
             }
             _ => {}
         }
@@ -48,7 +48,7 @@ impl Generator {
         let mut x = 1;
 
         while x <= self.next {
-            prelude = format!("{},{}", prelude, self.get_element(x.to_string()));
+            prelude = format!("{},{}", prelude, self.get_element(&x.to_string()));
             x += 1;
         }
 
@@ -65,12 +65,14 @@ impl Generator {
                 return code;
             }
             1 => {
+                let parent_id = self.next.to_string();
                 self.next += 1;
                 let element_id = self.next.to_string();
                 let element_code = self.crate_element(node.tag);
-                let create_code = self.set_element(element_id, element_code);
+                let create_code = self.set_element(&element_id, element_code);
+                let append_code = self.append_child(&parent_id, &element_id);
 
-                code = format!("{}{}", code, create_code);
+                code = format!("{}{}{}", code, create_code, append_code);
 
                 for child in node.children {
                     let child_code = self.generate_jsx(child);
@@ -89,11 +91,11 @@ impl Generator {
 }
 
 impl Generator {
-    pub fn get_element(&mut self, element: String) -> String {
+    pub fn get_element(&mut self, element: &String) -> String {
         return format!("{}{}", "f", &element);
     }
 
-    pub fn set_element(&mut self, element: String, code: String) -> String {
+    pub fn set_element(&mut self, element: &String, code: String) -> String {
         return format!("{}={}", self.get_element(element), code);
     }
 
@@ -108,7 +110,7 @@ impl Generator {
     pub fn set_attrbute(&mut self, atribute: (String, String), element: String) -> String {
         return format!(
             "f.sa({},'{}','{}');",
-            self.get_element(element),
+            self.get_element(&element),
             atribute.0,
             atribute.1
         );
@@ -117,19 +119,19 @@ impl Generator {
     pub fn add_event(&mut self, element: String, key: String, handler: String) -> String {
         return format!(
             "f.ael({},'{}','{}');",
-            self.get_element(element),
+            self.get_element(&element),
             key,
             handler
         );
     }
 
     pub fn set_text_content(&mut self, element: String, content: String) -> String {
-        return format!("f.stc({},'{}');", self.get_element(element), content);
+        return format!("f.stc({},'{}');", self.get_element(&element), content);
     }
 
-    pub fn append_child(&mut self, parent: String, element: String) -> String {
+    pub fn append_child(&mut self, parent: &String, element: &String) -> String {
         return format!(
-            "f.ac({},'{}');",
+            "f.ac({},{});",
             self.get_element(element),
             self.get_element(parent)
         );
@@ -138,17 +140,17 @@ impl Generator {
     pub fn remove_child(&mut self, parent: String, element: String) -> String {
         return format!(
             "f.rc({},'{}');",
-            self.get_element(element),
-            self.get_element(parent)
+            self.get_element(&parent),
+            self.get_element(&element),
         );
     }
 
     pub fn insert_before(&mut self, parent: String, element: String, after: String) -> String {
         return format!(
             "f.ib({},\"{}\",\"{}\");",
-            self.get_element(element),
-            self.get_element(parent),
-            self.get_element(after)
+            self.get_element(&parent),
+            self.get_element(&element),
+            self.get_element(&after)
         );
     }
 }
