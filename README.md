@@ -65,11 +65,11 @@ let a = 0;
             children: [
                 {
                     kind: 1 << 3 & 1 << 21,
-                    text: 'a'
+                    raw: 'a'
                 }
                 {
                     kind: 1 << 3 & 1 << 22, // 代表同时是 identity 和 number
-                    text: 0
+                    raw: 0
                 }
             ] 
         }
