@@ -5,7 +5,7 @@ pub mod generator;
 fn main() {
     // println!("Hello, world!");
     let str = "function App(){
-        return <div a=\"b\" c=\"d\"><h1>hello world</h1></div>
+        return <div a=\"b\" c=\"d\"><img src=\"aaa\"/><h1>hello world</h1></div>
     }";
     let mut p = parser::Parser::new(str);
     let root = p.parse_all().unwrap();
