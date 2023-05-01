@@ -12,14 +12,15 @@ impl Generator {
     }
 
     pub fn generate_fre(&mut self) -> String {
-        let root = self.root.clone();
-        return self.generate(root);
+        return self.generate();
     }
 
-    pub fn generate(&mut self, node: Node) -> String {
+    pub fn generate(&mut self) -> String {
         let mut create = "".to_string();
         let mut update = "".to_string();
         let mut distory = "".to_string();
+
+        let node = self.root.clone();
 
         for child in node.children {
             let out = self.generate_node(child);
@@ -33,12 +34,12 @@ impl Generator {
         let mut x = 1;
 
         while x < self.next {
-            prelude = format!(",{}", self.get_element(x.to_string()));
+            prelude = format!("{},{}", prelude, self.get_element(x.to_string()));
             x += 1;
         }
 
         return format!(
-            "{};return [function($){{{}",
+            "{};return [function($){{{},",
             prelude,
             self.set_element("0".to_string(), "$".to_string())
         );
@@ -48,6 +49,7 @@ impl Generator {
         let mut create = "".to_string();
         let mut update = "".to_string();
         let mut distory = "".to_string();
+        self.next += 1;
 
         return ("".to_string(), "".to_string(), "".to_string());
     }

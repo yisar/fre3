@@ -70,14 +70,11 @@ impl Parser {
                     }
 
                     Token::AttributeKey(k) => {
-                        //todo
-                        // let last_idx_parsed = parsed.len() - 1;
                         props.push((k.to_string(), "".to_string()));
                         idx += 1;
                     }
 
                     Token::AttributeValue(v) => {
-                        //todo
                         let last_props = props.len() - 1;
                         let k = &props[last_props].0;
                         props[last_props] = (k.to_string(), v.to_string());
@@ -85,7 +82,6 @@ impl Parser {
                     }
 
                     Token::SelfCloseTag(k) => {
-                        //todo
                         idx += 1;
                     }
 

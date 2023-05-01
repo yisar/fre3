@@ -1,6 +1,6 @@
 pub mod lexer;
 pub mod parser;
-// pub mod generator;
+pub mod generator;
 
 fn main() {
     // println!("Hello, world!");
@@ -9,9 +9,10 @@ fn main() {
     }";
     let mut p = parser::Parser::new(str);
     let root = p.parse_all().unwrap();
-    // println!("{:#?}", p.lexer.tokens)
-    println!("{:#?}", root)
-    // let mut g = generator::Generator::new(root);
-
+    // println!("{:#?}", p.lexer.tokens);
+    // println!("{:#?}", root)
+    let mut g = generator::Generator::new(root.clone());
+    let mut out = g.generate();
+println!("{:#?}", out)
 
 }
