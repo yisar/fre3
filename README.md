@@ -5,11 +5,10 @@
 input:
 
 ```js
+import f from 'fre'
 function App(){
-    const count = signal(0)
-    return <button onclick={() => count(count() + 1)}>
-        {count()}
-    </button>
+    const count = f.signal(0)
+    return <button onclick={()=>count(count()+1)}>{count()}</button>
 }
 
 document.body.appendChild(<App/>)
@@ -18,19 +17,19 @@ output:
 
 ```js
 function App() {
-    const count = signal(0)
+    const count = f.signal(0)
     return (() => {
-        let f0, f1; 
-        f1 = f.createElement('button');
-        f1.addEventListener('click', () => count(count() + 1))
-        computed(() => { // 是闭包！不是 Proxy!
-            f.setTextContent(f2, count());
-        });
+        let f0, f1;
+        f1 = f.ce('button');
+        f.ac(f0, f1);
+        f.ael(f1, 'onclick', () => count(count() + 1));
+        f.computed(() => f.stc(f1, count())); // 是闭包！
         return f1;
     })()
 }
 
-document.appendChild(App())
+document.body.appendChild(App())
+
 ```
 
 ### 动机

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>demo</title>
+</head>
+
+<body>
+    <script type="module">
+        import f from './f.js'
+
+        function App() {
+            const count = f.signal(0)
+            return (() => {
+                let f0, f1;
+                f1 = f.ce('button');
+                f.ac(f0, f1);
+                f.ael(f1, 'onclick', () => count(count() + 1));
+                f.computed(() => f.stc(f1, count()));
+                return f1;
+            })()
+        }
+
+        document.body.appendChild(App())
+
+    </script>
+</body>
+
+</html>

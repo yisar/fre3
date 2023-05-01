@@ -12,7 +12,7 @@ impl Lexer {
         }
     }
 
-    pub fn tokenize_all(&mut self)  {
+    pub fn tokenize_all(&mut self) {
         let mut reading = false;
         let mut idx = 0;
 
@@ -24,9 +24,7 @@ impl Lexer {
             let posible_next_letter = to_read.chars().nth(idx + 1);
 
             match (posible_letter, posible_next_letter, posible_last_token) {
-                (None, ..) => {
-                    break
-                }
+                (None, ..) => break,
                 (Some('<'), Some(next_letter), _) => {
                     let token = if next_letter == '/' {
                         Token::CloseTag(String::new())
@@ -49,11 +47,28 @@ impl Lexer {
 
                     idx += 2;
                 }
-                (Some('>'), ..) | (Some('"'), ..) => {
+                (Some('{'), _, Some(Token::AttributeValue(_))) => {
+                    self.tokens.push(Token::Signal(String::new()));
+                    reading = true;
+                    idx += 1;
+                }
+                (Some('}'), _, Some(Token::AttributeValue(_))) | (Some('}'), _, Some(Token::Signal(_))) => {
                     reading = false;
                     idx += 1;
                 }
-                (Some('='), Some('"'), _) => {
+                (Some('>'), _, Some(last_token)) | (Some('"'), _, Some(last_token)) => {
+                    if let Token::AttributeValue(t) = last_token {
+                        let last_str = &t[(t.len() - 1)..(t.len())];
+                        if last_str == "=" {
+                            last_token.add('>');
+                        };
+                        idx += 1;
+                    } else {
+                        reading = false;
+                        idx += 1;
+                    }
+                }
+                (Some('='), Some('"'), _) | (Some('='), Some('{'), _) => {
                     self.tokens.push(Token::AttributeValue(String::new()));
                     reading = true;
                     idx += 2;
@@ -92,6 +107,7 @@ impl Lexer {
 #[derive(PartialEq, Debug, Clone)]
 pub enum Token {
     Text(String),
+    Signal(String),
     OpenTag(String),
     CloseTag(String),
     SelfCloseTag(String),
@@ -103,6 +119,7 @@ impl Token {
     fn add(&mut self, c: char) {
         match *self {
             Token::Text(ref mut s)
+            | Token::Signal(ref mut s)
             | Token::OpenTag(ref mut s)
             | Token::CloseTag(ref mut s)
             | Token::SelfCloseTag(ref mut s)

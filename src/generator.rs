@@ -58,10 +58,14 @@ impl Generator {
     pub fn generate_jsx(&mut self, node: Node) -> String {
         let mut code = "".to_string();
         match node.kind {
-            2 => {
+            3 => {
                 let text_id = self.next.to_string();
                 let text_code = self.set_text_content(text_id, node.tag);
                 code = format!("{}{}", code, text_code);
+                return code;
+            }
+            2 => {
+                code = format!("{}{}", code, node.tag);
                 return code;
             }
             1 => {
@@ -73,6 +77,14 @@ impl Generator {
                 let append_code = self.append_child(&parent_id, &element_id);
 
                 code = format!("{}{}{}", code, create_code, append_code);
+
+                for prop in node.props {
+                    if &prop.0[0..2] == "on" {
+                        code = format!("{}{}", code, self.add_event(&element_id, prop.0, prop.1));
+                    } else {
+                        code = format!("{}{}", code, self.set_attrbute(prop, &element_id));
+                    }
+                }
 
                 for child in node.children {
                     let child_code = self.generate_jsx(child);
@@ -107,7 +119,7 @@ impl Generator {
         return format!("f.ctn('{}');", tag);
     }
 
-    pub fn set_attrbute(&mut self, atribute: (String, String), element: String) -> String {
+    pub fn set_attrbute(&mut self, atribute: (String, String), element: &String) -> String {
         return format!(
             "f.sa({},'{}','{}');",
             self.get_element(&element),
@@ -116,9 +128,9 @@ impl Generator {
         );
     }
 
-    pub fn add_event(&mut self, element: String, key: String, handler: String) -> String {
+    pub fn add_event(&mut self, element: &String, key: String, handler: String) -> String {
         return format!(
-            "f.ael({},'{}','{}');",
+            "f.ael({},'{}',{});",
             self.get_element(&element),
             key,
             handler
@@ -126,14 +138,18 @@ impl Generator {
     }
 
     pub fn set_text_content(&mut self, element: String, content: String) -> String {
-        return format!("f.stc({},'{}');", self.get_element(&element), content);
+        return format!(
+            "f.computed(()=>f.stc({},{}));",
+            self.get_element(&element),
+            content
+        );
     }
 
     pub fn append_child(&mut self, parent: &String, element: &String) -> String {
         return format!(
             "f.ac({},{});",
+            self.get_element(parent),
             self.get_element(element),
-            self.get_element(parent)
         );
     }
 

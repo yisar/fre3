@@ -110,8 +110,16 @@ impl Parser {
                     }
                     Token::Text(t) => {
                         idx += 1;
+                        
                         let mut n = Node::new(t.to_string());
+                        // println!("{}", t.get_mut(0));
                         n.kind = 2;
+                        parsed.push(n);
+                    }
+                    Token::Signal(t) => {
+                        idx += 1;
+                        let mut n = Node::new(t.to_string());
+                        n.kind = 3;
                         parsed.push(n);
                     }
 
