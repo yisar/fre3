@@ -27,7 +27,6 @@ impl Generator {
         return code;
     }
 
-
     pub fn generate_prelude(&mut self) -> String {
         let mut prelude = "let f0".to_string();
 
@@ -51,8 +50,19 @@ impl Generator {
                 return code;
             }
             3 => {
-                let text_id = self.next.to_string();
+                if node.children.len() == 0 {
+                    // 简单节点
+                    let text_id = self.next.to_string();
+                    let text_code = self.set_text_content(text_id, node.tag);
+                    code = format!("{}{}", code, text_code);
+                    return code;
+                }
                 code = format!("{}{}", code, node.tag);
+                for child in node.children {
+                    let child_code = self.generate_jsx(child);
+                    println!("{:#?}", child_code);
+                    code = format!("{}{}", code, child_code);
+                }
                 return code;
             }
             2 => {
@@ -60,6 +70,10 @@ impl Generator {
                 return code;
             }
             1 => {
+                if node.tag.chars().nth(0).unwrap().is_uppercase() {
+                    code = format!("{}{}()", code, node.tag);
+                    return code;
+                }
                 let parent_id = self.next.to_string();
                 self.next += 1;
                 let element_id = self.next.to_string();

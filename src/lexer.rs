@@ -3,7 +3,7 @@ pub struct Lexer {
     pub code: String,
     pub tokens: Vec<Token>,
     pub is_jsx: bool,
-    pub is_expr: bool,
+    pub signal: usize,
 }
 
 impl Lexer {
@@ -12,7 +12,7 @@ impl Lexer {
             code: code.to_string(),
             tokens: vec![],
             is_jsx: false,
-            is_expr: false,
+            signal: 0,
         }
     }
 
@@ -57,17 +57,15 @@ impl Lexer {
                 (Some('{'), _, Some(Token::AttributeValue(_)))
                 | (Some('{'), _, Some(Token::JSXText(_)))
                 | (Some('{'), _, Some(Token::OpenTag(_))) => {
-                    self.is_expr = true;
                     self.tokens.push(Token::Signal(String::new()));
                     reading = true;
                     idx += 1;
                 }
-                (Some('}'), _, Some(Token::AttributeValue(last_token)))
-                | (Some('}'), _, Some(Token::Signal(last_token))) => {
-                    let str = last_token.clone();
-                    self.tokens.push(Token::CloseSignal(str));
-                    self.is_expr = false;
-                    reading = false;
+                (Some('}'), next_letter, _) => {
+                    if next_letter == Some('<') {
+                        self.tokens.push(Token::CloseSignal(String::new()));
+                        reading = false;
+                    }
 
                     idx += 1;
                 }

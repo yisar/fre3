@@ -122,8 +122,20 @@ impl Parser {
                     Token::Signal(t) => {
                         idx += 1;
                         let mut n = Node::new(t.to_string());
+                        let tokens = slice_tokens[idx..].to_vec();
+                        let (childs, readed, _) = self.parse_schild(tokens);
+
+                        for child in childs {
+                            n.children.push(child)
+                        }
                         n.kind = 3;
+                        idx += readed;
                         parsed.push(n);
+                    }
+                    Token::CloseSignal(t) => {
+                        println!("{:#?}", parsed);
+                        idx += 1;
+                        break (parsed, idx, props);
                     }
                     Token::JSXText(t) => {
                         idx += 1;
