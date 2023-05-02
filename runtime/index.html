@@ -18,17 +18,19 @@
                 let f0, f1;
                 f1 = f.ce('div');
                 f.ac(f0, f1);
-                    count()
-                        .map((a,i) => (() => {
-                            let f0, f2;
-                            f2 = f.ce('button');
-                            f2.addEventListener('click', ()=>{
-                                
-                            })
-                            f.ac(f1, f2);
-                            f.stc(f2, a);
-                            return f1;
-                        })())
+                count()
+                    .map((a) => (() => {
+                        let f0, f2;
+                        f2 = f.ce('button');
+                        f2.addEventListener('click', () => {
+                            a(a() + 1)
+                        })
+                        f.ac(f1, f2);
+                        f.computed(() => {
+                            f.stc(f2, a());
+                        })
+                        return f1;
+                    })())
                 return f1;
             })()
         }

@@ -6,14 +6,14 @@ fn main() {
     // println!("Hello, world!");
     let str = "function App(){
         const count = f.signal(0)
-        return <button>{count().map(a=><i>{a}</i>)}</button>
+        return <button onclick={()=>count(count()+1)}>{count()}</button>
     }
-    document.body.appendChild(<App/>)";
+document.querySelector('.app').appendChild(<App/>)";
     let mut p = parser::Parser::new(str);
     let root = p.parse_all().unwrap();
-    // println!("{:#?}", p.lexer.tokens);
+    println!("{:#?}", p.lexer.tokens);
     // println!("{:#?}", root);
-    let mut g = generator::Generator::new(root.clone());
-    let out = g.generate();
-    println!("{:#?}", out)
+    // let mut g = generator::Generator::new(root.clone());
+    // let out = g.generate();
+    // println!("{:#?}", out)
 }
