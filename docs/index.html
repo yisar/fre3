@@ -99,11 +99,13 @@
         init().then(() => {
             const input = document.querySelector('.editor');
             const output = document.querySelector('.output');
-            input.value = `function App(){
-        const count = f.signal(0)
-        return <button onclick={()=>count(count()+1)}>{count()}</button>
-    }
-document.querySelector('.app').appendChild(<App/>)`;
+            input.value = `function App() {
+    const count = f.signal([1, 2, 3])
+    return <div onclick={() => count(count().reverse())}>
+        {count().map(c => <button>{c}</button>)}
+    </div>
+}
+document.querySelector('.app').appendChild(<App />)`;
             let oo = format(compile(input.value))
             output.textContent = oo;
             exec(oo)
