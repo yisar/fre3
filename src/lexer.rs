@@ -61,10 +61,12 @@ impl Lexer {
                     reading = true;
                     idx += 1;
                 }
-                (Some('}'), next_letter, _) => {
+                (Some('}'), next_letter, Some(last_token)) => {
                     if next_letter == Some('<') {
                         self.tokens.push(Token::CloseSignal(String::new()));
                         reading = false;
+                    } else {
+                        last_token.add('}')
                     }
 
                     idx += 1;

@@ -13,17 +13,25 @@
         import f from './f.js'
 
         function App() {
-            const count = f.signal(0)
+            const count = f.signal([1, 2, 3])
             return (() => {
                 let f0, f1;
-                f1 = f.ce('button');
+                f1 = f.ce('div');
                 f.ac(f0, f1);
-                f.ael(f1, 'onclick', () => count(count() + 1));
-                f.computed(() => f.stc(f1, count()));
+                    count()
+                        .map((a,i) => (() => {
+                            let f0, f2;
+                            f2 = f.ce('button');
+                            f2.addEventListener('click', ()=>{
+                                
+                            })
+                            f.ac(f1, f2);
+                            f.stc(f2, a);
+                            return f1;
+                        })())
                 return f1;
             })()
         }
-
         document.body.appendChild(App())
 
     </script>

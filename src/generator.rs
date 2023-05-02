@@ -27,10 +27,10 @@ impl Generator {
         return code;
     }
 
-    pub fn generate_prelude(&mut self) -> String {
+    pub fn generate_prelude(&mut self, start:usize) -> String {
         let mut prelude = "let f0".to_string();
 
-        let mut x = 1;
+        let mut x = start;
 
         while x <= self.next {
             prelude = format!("{},{}", prelude, self.get_element(&x.to_string()));
@@ -80,7 +80,7 @@ impl Generator {
                 let element_code = self.crate_element(node.tag);
                 let create_code = self.set_element(&element_id, element_code);
                 let append_code = self.append_child(&parent_id, &element_id);
-                let pre = self.generate_prelude();
+                let pre = self.generate_prelude(self.next);
 
                 code = format!("{}{}{}", code, create_code, append_code);
 
