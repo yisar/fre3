@@ -57,10 +57,6 @@ function signal(value) {
                 tracking._observables.push(data);
             }
 
-
-            if (Array.isArray(value)) {
-                return value.map(signal)
-            }
             return value;
         }
 

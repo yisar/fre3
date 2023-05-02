@@ -27,7 +27,7 @@ impl Generator {
         return code;
     }
 
-    pub fn generate_prelude(&mut self, start:usize) -> String {
+    pub fn generate_prelude(&mut self, start: usize) -> String {
         let mut prelude = "let f0".to_string();
 
         let mut x = start;
@@ -54,7 +54,8 @@ impl Generator {
                     // 简单节点
                     let text_id = self.next.to_string();
                     let text_code = self.set_text_content(text_id, node.tag);
-                    code = format!("{}{}", code, text_code);
+                    let out = self.set_computed(text_code);
+                    code = format!("{}{}", code, out);
                     return code;
                 }
                 code = format!("{}{}", code, node.tag);
@@ -63,7 +64,7 @@ impl Generator {
                     println!("{:#?}", child_code);
                     code = format!("{}{}", code, child_code);
                 }
-                return code;
+                return self.set_computed(code);
             }
             2 => {
                 code = format!("{}{}", code, node.tag);
@@ -143,12 +144,12 @@ impl Generator {
         );
     }
 
+    pub fn set_computed(&mut self, code: String) -> String {
+        return format!("f.computed(()=>{});", code);
+    }
+
     pub fn set_text_content(&mut self, element: String, content: String) -> String {
-        return format!(
-            "f.computed(()=>f.stc({},{}));",
-            self.get_element(&element),
-            content
-        );
+        return format!("f.stc({},{})", self.get_element(&element), content);
     }
 
     pub fn append_child(&mut self, parent: &String, element: &String) -> String {

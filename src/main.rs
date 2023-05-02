@@ -6,7 +6,7 @@ fn main() {
     // println!("Hello, world!");
     let str = "function App(){
         const count = f.signal([1,2,3])
-        return <div onclick={()=>count([])}>{count()
+        return <div onclick={()=>count([])}>{count().map(c=><button>{c}</button>)
 }</div>
     }
 document.querySelector('.app').appendChild(<App/>)";
