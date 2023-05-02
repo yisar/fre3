@@ -125,6 +125,12 @@ impl Parser {
                         n.kind = 3;
                         parsed.push(n);
                     }
+                    Token::JSXText(t) => {
+                        idx += 1;
+                        let mut n = Node::new(t.to_string());
+                        n.kind = 4;
+                        parsed.push(n);
+                    }
 
                     _ => {
                         idx += 1;

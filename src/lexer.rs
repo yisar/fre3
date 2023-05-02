@@ -2,6 +2,7 @@
 pub struct Lexer {
     pub code: String,
     pub tokens: Vec<Token>,
+    pub is_jsx: bool,
 }
 
 impl Lexer {
@@ -9,6 +10,7 @@ impl Lexer {
         Lexer {
             code: code.to_string(),
             tokens: vec![],
+            is_jsx: false,
         }
     }
 
@@ -27,8 +29,10 @@ impl Lexer {
                 (None, ..) => break,
                 (Some('<'), Some(next_letter), _) => {
                     let token = if next_letter == '/' {
+                        self.is_jsx = false;
                         Token::CloseTag(String::new())
                     } else {
+                        self.is_jsx = true;
                         Token::OpenTag(String::from(next_letter))
                     };
 
@@ -42,17 +46,19 @@ impl Lexer {
                         _ => false,
                     }) {
                         token.convert_to_self_close_tag();
+                        self.is_jsx = false;
                         reading = false;
                     }
 
                     idx += 2;
                 }
-                (Some('{'), _, Some(Token::AttributeValue(_))) => {
+                (Some('{'), _, Some(Token::AttributeValue(_))) | (Some('{'), _, Some(Token::JSXText(_))) => {
                     self.tokens.push(Token::Signal(String::new()));
                     reading = true;
                     idx += 1;
                 }
-                (Some('}'), _, Some(Token::AttributeValue(_))) | (Some('}'), _, Some(Token::Signal(_))) => {
+                (Some('}'), _, Some(Token::AttributeValue(_)))
+                | (Some('}'), _, Some(Token::Signal(_))) => {
                     reading = false;
                     idx += 1;
                 }
@@ -90,7 +96,12 @@ impl Lexer {
                     idx += 1;
                 }
                 (Some(letter), _, _) if !reading => {
-                    self.tokens.push(Token::Text(String::from(letter)));
+                    if self.is_jsx {
+                        self.tokens.push(Token::JSXText(String::from(letter)));
+                    } else {
+                        self.tokens.push(Token::Text(String::from(letter)));
+                    }
+
                     reading = true;
                     idx += 1;
                 }
@@ -107,6 +118,7 @@ impl Lexer {
 #[derive(PartialEq, Debug, Clone)]
 pub enum Token {
     Text(String),
+    JSXText(String),
     Signal(String),
     OpenTag(String),
     CloseTag(String),
@@ -120,6 +132,7 @@ impl Token {
         match *self {
             Token::Text(ref mut s)
             | Token::Signal(ref mut s)
+            | Token::JSXText(ref mut s)
             | Token::OpenTag(ref mut s)
             | Token::CloseTag(ref mut s)
             | Token::SelfCloseTag(ref mut s)
