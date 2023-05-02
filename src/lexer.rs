@@ -62,10 +62,13 @@ impl Lexer {
                     reading = true;
                     idx += 1;
                 }
-                (Some('}'), _, Some(Token::AttributeValue(_)))
-                | (Some('}'), _, Some(Token::Signal(_))) => {
+                (Some('}'), _, Some(Token::AttributeValue(last_token)))
+                | (Some('}'), _, Some(Token::Signal(last_token))) => {
+                    let str = last_token.clone();
+                    self.tokens.push(Token::CloseSignal(str));
                     self.is_expr = false;
                     reading = false;
+
                     idx += 1;
                 }
                 (Some('>'), _, Some(last_token)) | (Some('"'), _, Some(last_token)) => {
@@ -135,6 +138,7 @@ pub enum Token {
     Signal(String),
     OpenTag(String),
     CloseTag(String),
+    CloseSignal(String),
     SelfCloseTag(String),
     AttributeKey(String),
     AttributeValue(String),
@@ -148,6 +152,7 @@ impl Token {
             | Token::JSXText(ref mut s)
             | Token::OpenTag(ref mut s)
             | Token::CloseTag(ref mut s)
+            | Token::CloseSignal(ref mut s)
             | Token::SelfCloseTag(ref mut s)
             | Token::AttributeKey(ref mut s)
             | Token::AttributeValue(ref mut s) => {
