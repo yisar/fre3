@@ -55,7 +55,8 @@ impl Lexer {
                     idx += 2;
                 }
                 (Some('{'), _, Some(Token::AttributeValue(_)))
-                | (Some('{'), _, Some(Token::JSXText(_))) => {
+                | (Some('{'), _, Some(Token::JSXText(_)))
+                | (Some('{'), _, Some(Token::OpenTag(_))) => {
                     self.is_expr = true;
                     self.tokens.push(Token::Signal(String::new()));
                     reading = true;
@@ -75,13 +76,12 @@ impl Lexer {
                         }
                         Token::AttributeValue(t) | Token::Signal(t) => {
                             let last_str = &t[(t.len() - 1)..(t.len())];
-                            println!("{}", last_str);
                             if last_str == "=" {
                                 last_token.add('>');
                             };
                             idx += 1;
                         }
-                        
+
                         _ => {
                             idx += 1;
                         }

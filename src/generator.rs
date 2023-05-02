@@ -92,6 +92,7 @@ impl Generator {
 
                 for child in node.children {
                     let child_code = self.generate_jsx(child);
+                    println!("{:#?}", child_code);
                     code = format!("{}{}", code, child_code);
                 }
 
