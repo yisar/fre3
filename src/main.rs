@@ -11,9 +11,9 @@ fn main() {
     document.body.appendChild(<App/>)";
     let mut p = parser::Parser::new(str);
     let root = p.parse_all().unwrap();
-    println!("{:#?}", p.lexer.tokens);
-    // println!("{:#?}", root);
-    // let mut g = generator::Generator::new(root.clone());
-    // let out = g.generate();
-    // println!("{:#?}", out)
+    // println!("{:#?}", p.lexer.tokens);
+    println!("{:#?}", root);
+    let mut g = generator::Generator::new(root.clone());
+    let out = g.generate();
+    println!("{:#?}", out)
 }

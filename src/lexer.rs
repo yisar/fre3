@@ -68,12 +68,23 @@ impl Lexer {
                     idx += 1;
                 }
                 (Some('>'), _, Some(last_token)) | (Some('"'), _, Some(last_token)) => {
-                    if let Token::CloseTag(t) = last_token {
-                        reading = false;
-                        idx += 1;
-                    } else {
-                        last_token.add('>');
-                        idx += 1;
+                    match last_token {
+                        Token::CloseTag(t) => {
+                            reading = false;
+                            idx += 1;
+                        }
+                        Token::AttributeValue(t) | Token::Signal(t) => {
+                            let last_str = &t[(t.len() - 1)..(t.len())];
+                            println!("{}", last_str);
+                            if last_str == "=" {
+                                last_token.add('>');
+                            };
+                            idx += 1;
+                        }
+                        
+                        _ => {
+                            idx += 1;
+                        }
                     }
                 }
                 (Some('='), Some('"'), _) | (Some('='), Some('{'), _) => {
