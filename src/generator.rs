@@ -83,7 +83,7 @@ impl Generator {
                 let append_code = self.append_child(&parent_id, &element_id);
                 let pre = self.generate_prelude(self.next);
 
-                code = format!("{}{}{}", code, create_code, append_code);
+                code = format!("{}{}", code, create_code);
 
                 for prop in node.props {
                     if &prop.0[0..2] == "on" {
@@ -99,7 +99,7 @@ impl Generator {
                     code = format!("{}{}", code, child_code);
                 }
 
-                code = format!("(()=>{{{}{}return f1;}})();", pre, code);
+                code = format!("(()=>{{{}{}{}\nreturn f1;}})()\n", pre, code,append_code);
 
                 return code;
             }

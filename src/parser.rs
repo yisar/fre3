@@ -35,7 +35,7 @@ impl Parser {
 
     pub fn parse_all(&mut self) -> Result<Node, ()> {
         self.lexer.tokenize_all();
-        let (childs, idx, _) = self.parse_schild(self.lexer.tokens.clone());
+        let (childs, _, _) = self.parse_schild(self.lexer.tokens.clone());
         let mut node = Node::new("root".to_string());
         for child in childs {
             node.children.push(child);
@@ -104,7 +104,7 @@ impl Parser {
                         idx += readed;
                     }
 
-                    Token::CloseTag(s) => {
+                    Token::CloseTag(_) => {
                         idx += 1;
                         break (parsed, idx, props);
                     }
@@ -132,8 +132,7 @@ impl Parser {
                         idx += readed;
                         parsed.push(n);
                     }
-                    Token::CloseSignal(t) => {
-                        println!("{:#?}", parsed);
+                    Token::CloseSignal(_) => {
                         idx += 1;
                         break (parsed, idx, props);
                     }

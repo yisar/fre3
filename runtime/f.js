@@ -18,14 +18,13 @@ const setTextContent = function (element, content) {
     element.textContent = content;
 };
 
-const appendChild = function (parent, element, index) {
+const appendChild = function (parent, element) {
     if (!parent) {
         return
     }
+    parent._id = parent._id || 0
     const oldChildren = Array.from(parent.childNodes)
-    const oldChild = oldChildren[index]
-    console.dir(oldChild)
-
+    const oldChild = oldChildren[parent._id]
 
 
     if (oldChild && element && oldChild.nodeName === element.nodeName) {
@@ -37,6 +36,10 @@ const appendChild = function (parent, element, index) {
     } else if (!oldChild) {
         parent.appendChild(element)
     }
+    parent._id++
+    setTimeout(() => {
+        parent._id = 0
+    }, 0);
 };
 
 const removeChild = function (parent, element) {

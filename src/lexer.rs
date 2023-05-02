@@ -75,7 +75,7 @@ impl Lexer {
                 }
                 (Some('>'), _, Some(last_token)) | (Some('"'), _, Some(last_token)) => {
                     match last_token {
-                        Token::CloseTag(t) => {
+                        Token::CloseTag(_) => {
                             reading = false;
                             idx += 1;
                         }
