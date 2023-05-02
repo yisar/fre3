@@ -20,31 +20,13 @@ impl Generator {
         let mut code = "".to_string();
 
         for child in node.children {
-            let out = self.generate_node(child);
+            let out = self.generate_jsx(child);
             code = format!("{}{}", code, out);
         }
 
         return code;
     }
 
-    pub fn generate_node(&mut self, node: Node) -> String {
-        let mut code = "".to_string();
-        match node.kind {
-            2 => code = format!("{}{}", code, node.tag),
-            1 => {
-                if node.tag.chars().nth(0).unwrap().is_uppercase() {
-                    code = format!("{}{}()", code, node.tag)
-                } else {
-                    let jsx_out = self.generate_jsx(node);
-                    let pre = self.generate_prelude();
-                    code = format!("(()=>{{{}{}{}return f1;}})()", pre, code, jsx_out)
-                }
-            }
-            _ => {}
-        }
-
-        return code;
-    }
 
     pub fn generate_prelude(&mut self) -> String {
         let mut prelude = "let f0".to_string();
@@ -62,10 +44,15 @@ impl Generator {
     pub fn generate_jsx(&mut self, node: Node) -> String {
         let mut code = "".to_string();
         match node.kind {
-            3 => {
+            4 => {
                 let text_id = self.next.to_string();
                 let text_code = self.set_text_content(text_id, node.tag);
                 code = format!("{}{}", code, text_code);
+                return code;
+            }
+            3 => {
+                let text_id = self.next.to_string();
+                code = format!("{}{}", code, node.tag);
                 return code;
             }
             2 => {
@@ -79,6 +66,7 @@ impl Generator {
                 let element_code = self.crate_element(node.tag);
                 let create_code = self.set_element(&element_id, element_code);
                 let append_code = self.append_child(&parent_id, &element_id);
+                let pre = self.generate_prelude();
 
                 code = format!("{}{}{}", code, create_code, append_code);
 
@@ -96,10 +84,9 @@ impl Generator {
                     code = format!("{}{}", code, child_code);
                 }
 
-                return code;
-                // let mut jsx_out = self.generate_jsx(node);
+                code = format!("(()=>{{{}{}return f1;}})()", pre, code);
 
-                // element
+                return code;
             }
             _ => {}
         }
