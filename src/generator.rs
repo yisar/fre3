@@ -98,7 +98,7 @@ impl Generator {
                     code = format!("{}{}", code, child_code);
                 }
 
-                code = format!("(()=>{{{}{}return f1;}})()", pre, code);
+                code = format!("(()=>{{{}{}return f1;}})();", pre, code);
 
                 return code;
             }
