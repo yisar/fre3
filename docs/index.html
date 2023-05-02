@@ -104,12 +104,12 @@
         return <button onclick={()=>count(count()+1)}>{count()}</button>
     }
 document.querySelector('.app').appendChild(<App/>)`;
-            let oo = format(compile(input.value))
+            let oo = compile(input.value)
             output.textContent = oo;
             exec(oo)
             input.oninput = (e) => {
                 const i = e.target.value
-                const o = format(compile(input.value))
+                const o = compile(input.value)
                 output.textContent = o;
                 exec(o)
             }
