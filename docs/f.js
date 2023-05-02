@@ -22,7 +22,24 @@ const appendChild = function (parent, element) {
     if (!parent) {
         return
     }
-    parent.appendChild(element);
+    parent._id = parent._id || 0
+    const oldChildren = Array.from(parent.childNodes)
+    const oldChild = oldChildren[parent._id]
+
+
+    if (oldChild && element && oldChild.nodeName === element.nodeName) {
+        oldChild.textContent = element.textContent
+    } else if (oldChild && element) {
+        parent.removeChild(oldChild)
+        parent.appendChild(element)
+
+    } else if (!oldChild) {
+        parent.appendChild(element)
+    }
+    parent._id++
+    setTimeout(() => {
+        parent._id = 0
+    }, 0);
 };
 
 const removeChild = function (parent, element) {

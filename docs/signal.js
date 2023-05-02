@@ -50,11 +50,13 @@ export function transaction(fn) {
 
 function signal(value) {
     function data(nextValue) {
+
         if (arguments.length === 0) {
             if (tracking && !data._observers.has(tracking)) {
                 data._observers.add(tracking);
                 tracking._observables.push(data);
             }
+
             return value;
         }
 
@@ -78,6 +80,7 @@ function signal(value) {
         });
 
         tracking = clearedUpdate;
+
         return value;
     }
     data.$o = 1;
