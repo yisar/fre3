@@ -36,7 +36,7 @@ impl Parser {
     }
 
     pub fn parse_all(&mut self) -> Result<Node, ()> {
-        self.lexer.tokenize(self.code.to_string(),false);
+        self.lexer.tokenize(self.code.to_string(), false);
         let (childs, _, _) = self.parse_child(self.lexer.tokens.clone());
         let mut node = Node::new("root".to_string());
         for child in childs {
@@ -70,6 +70,9 @@ impl Parser {
 
                         for child in childs {
                             node.children.push(child)
+                        }
+                        if node.children[0].kind == 3 {
+                            node.kind = 5
                         }
                         node.props = props;
                         node.kind = 1;

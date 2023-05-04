@@ -5,7 +5,7 @@ pub mod generator;
 fn main() {
     // println!("Hello, world!");
     let code = "function App(){
-        return <div onclick={()=>{add()}}>{list.map(a=><i>aaa{a()}</i>)}</div>
+        return <div onclick={()=>{add()}}>{list.map(a=><i>{a()}</i>)}</div>
     }";
     let mut parser = parser::Parser::new(code);
     let root = parser.parse_all().unwrap();
