@@ -1,20 +1,16 @@
-pub mod generator;
 pub mod lexer;
 pub mod parser;
+pub mod generator;
 
 fn main() {
     // println!("Hello, world!");
-    let str = "function App(){
-        const count = f.signal([1,2,3])
-        return <div onclick={()=>count([3,2,1])}>{count().map(c=><button>{c}</button>)
-}</div>
-    }
-document.querySelector('.app').appendChild(<App/>)";
-    let mut p = parser::Parser::new(str);
-    let root = p.parse_all().unwrap();
-    println!("{:#?}", p.lexer.tokens);
-    // println!("{:#?}", root);
-    let mut g = generator::Generator::new(root.clone());
+    let code = "function App(){
+        return <div onclick={()=>{add()}}>{list.map(a=><i>aaa{a()}</i>)}</div>
+    }";
+    let mut parser = parser::Parser::new(code);
+    let root = parser.parse_all().unwrap();
+    println!("{:#?}", root);
+    let mut g = generator::Generator::new(root);
     let out = g.generate();
-    println!("{:#?}", out)
+    println!("{}",out);
 }

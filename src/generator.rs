@@ -50,18 +50,17 @@ impl Generator {
                 return code;
             }
             3 => {
-                if node.children.len() == 0 {
-                    // 简单节点
-                    let text_id = self.next.to_string();
-                    let text_code = self.set_text_content(text_id, node.tag);
-                    let out = self.set_computed(text_code);
-                    code = format!("{}{}", code, out);
-                    return code;
-                }
+                // if node.tag.len() == 0 {
+                //     // 简单节点
+                //     let text_id = self.next.to_string();
+                //     let text_code = self.set_text_content(text_id, node.tag);
+                //     let out = self.set_computed(text_code);
+                //     code = format!("{}{}", code, out);
+                //     return code;
+                // }
                 code = format!("{}{}", code, node.tag);
                 for child in node.children {
                     let child_code = self.generate_jsx(child);
-                    println!("{:#?}", child_code);
                     code = format!("{}{}", code, child_code);
                 }
                 return self.set_computed(code);
@@ -95,11 +94,10 @@ impl Generator {
 
                 for child in node.children {
                     let child_code = self.generate_jsx(child);
-                    println!("{:#?}", child_code);
                     code = format!("{}{}", code, child_code);
                 }
 
-                code = format!("(()=>{{{}{}{}\nreturn f1;}})()\n", pre, code,append_code);
+                code = format!("(()=>{{{}{}{}\nreturn f1;}})()\n", pre, code, append_code);
 
                 return code;
             }

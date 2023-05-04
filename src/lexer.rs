@@ -1,9 +1,20 @@
+use regex::Regex;
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct Lexer {
     pub code: String,
     pub tokens: Vec<Token>,
-    pub is_jsx: bool,
-    pub signal: usize,
+}
+
+#[derive(PartialEq, Debug, Clone)]
+pub enum Token {
+    Code(String),
+    Text(String),
+    OpenTag(String),
+    CloseTag(String),
+    SelfCloseTag(String),
+    AttributeKey(String),
+    AttributeValue(String),
 }
 
 impl Lexer {
@@ -11,161 +22,234 @@ impl Lexer {
         Lexer {
             code: code.to_string(),
             tokens: vec![],
-            is_jsx: false,
-            signal: 0,
         }
     }
 
-    pub fn tokenize_all(&mut self) {
-        let mut reading = false;
-        let mut idx = 0;
+    pub fn start(&mut self, code: String) -> isize {
+        let re = Regex::new(r"<([\w]+).*?>").unwrap();
+        let caps = re.captures(&code);
 
-        let to_read = self.code.clone();
+        match caps {
+            Some(c) => {
+                return c.get(0).unwrap().start() as isize;
+            }
+            None => {
+                return -1;
+            }
+        }
+    }
+
+    pub fn read_head(&mut self, code: &String, is_block: bool) -> isize {
+        let end = self.start(code.to_string());
+        if end == -1 {
+            return -1;
+        }
+        let code = &code[0..end as usize];
+        if code.len() > 0 {
+            if is_block {
+                self.tokens.push(Token::Code(code.to_string()));
+            } else {
+                self.tokens.push(Token::Text(code.to_string()));
+            }
+        }
+
+        // FXEYYKFNKX4E4RGQ
+
+        return end;
+    }
+
+    pub fn tokenize(&mut self, input: String, is_block: bool) -> usize {
+        let code = input.clone();
+        let end = self.read_head(&code, is_block);
+
+        if end == -1 {
+            // tobe fixed
+            self.tokens.push(Token::Code(code.to_string()));
+            return code.len();
+        }
+
+        let mut i = end as usize;
 
         loop {
-            let posible_last_token = self.tokens.last_mut();
-            let posible_letter = to_read.chars().nth(idx);
-            let posible_next_letter = to_read.chars().nth(idx + 1);
+            let current_letter = code.chars().nth(i);
+            let next_letter = code.chars().nth(i + 1);
+            match (current_letter, next_letter) {
+                (None, ..) => {
+                    break i;
+                }
+                (Some(' '), Some(' ')) | (Some('>'), Some(_)) => {
+                    i += 1;
+                }
 
-            match (posible_letter, posible_next_letter, posible_last_token) {
-                (None, ..) => break,
-                (Some('<'), Some(next_letter), _) => {
-                    let token = if next_letter == '/' {
-                        self.is_jsx = false;
-                        Token::CloseTag(String::new())
+                (Some('{'), _) => {
+                    let (_, end) = self.read_block(code[i..].to_string());
+                    i += end;
+                }
+
+                (Some(' '), _) => {
+                    let (key, end) = self.read_attrbute_key(code[i..].to_string());
+                    self.tokens.push(Token::AttributeKey(key));
+                    i += end;
+                }
+
+                (Some('='), _) => {
+                    let (value, end) = self.read_attrbute_value(code[i..].to_string());
+                    self.tokens.push(Token::AttributeValue(value));
+                    i += end;
+                }
+                (Some('<'), Some(next_letter)) => {
+                    if next_letter == '/' {
+                        i += 2;
+                        let (tag, end, _) = self.read_tag(code[i..].to_string());
+                        self.tokens.push(Token::CloseTag(tag));
+                        i += end;
+                        break i;
                     } else {
-                        self.is_jsx = true;
-                        Token::OpenTag(String::from(next_letter))
+                        i += 1;
+                        let (tag, end, selfclose) = self.read_tag(code[i..].to_string());
+                        i += end;
+                        if selfclose {
+                            self.tokens.push(Token::SelfCloseTag(tag));
+                        } else {
+                            self.tokens.push(Token::OpenTag(tag));
+                        }
                     };
+                }
+                _ => {
+                    let (text, end) = self.read_text(code[i..].to_string());
+                    self.tokens.push(Token::Text(text));
+                    i += end;
+                }
+            }
+        }
+    }
 
-                    self.tokens.push(token);
-                    reading = true;
-                    idx += 2;
-                }
-                (Some('/'), Some('>'), _) => {
-                    if let Some(token) = self.tokens.iter_mut().rev().find(|i| match i {
-                        Token::OpenTag(_) => true,
-                        _ => false,
-                    }) {
-                        token.convert_to_self_close_tag();
-                        self.is_jsx = false;
-                        reading = false;
-                    }
+    pub fn read_block(&mut self, code: String) -> (String, usize) {
+        let mut i = 0;
+        let mut block = "".to_string();
+        let mut count = 1;
+        i += 1;
 
-                    idx += 2;
+        loop {
+            let current_letter = code.chars().nth(i);
+            match current_letter {
+                Some('{') => {
+                    count += 1;
                 }
-                (Some('{'), _, Some(Token::AttributeValue(_)))
-                | (Some('{'), _, Some(Token::JSXText(_)))
-                | (Some('{'), _, Some(Token::OpenTag(_))) => {
-                    self.tokens.push(Token::Signal(String::new()));
-                    reading = true;
-                    idx += 1;
-                }
-                (Some('}'), Some(next_letter), Some(last_token)) => {
-                    if next_letter == '<' {
-                        self.tokens.push(Token::CloseSignal(String::new()));
-                        reading = false;
-                    } else {
-                        if next_letter != '>' {
-                            last_token.add('}')
-                        }
-                    }
-
-                    idx += 1;
-                }
-                (Some('>'), _, Some(last_token)) | (Some('"'), _, Some(last_token)) => {
-                    match last_token {
-                        Token::CloseTag(_) => {
-                            reading = false;
-                            idx += 1;
-                        }
-                        Token::AttributeValue(t) | Token::Signal(t) => {
-                            let last_str = &t[(t.len() - 1)..(t.len())];
-                            if last_str == "=" {
-                                last_token.add('>');
-                            };
-                            idx += 1;
-                        }
-
-                        _ => {
-                            idx += 1;
-                        }
-                    }
-                }
-                (Some('='), Some('"'), _) | (Some('='), Some('{'), _) => {
-                    self.tokens.push(Token::AttributeValue(String::new()));
-                    reading = true;
-                    idx += 2;
-                }
-                (Some(' '), Some('/'), _) => {
-                    reading = false;
-                    idx += 2;
-                }
-                (Some(' '), _, Some(last_token @ Token::AttributeValue(_))) if reading => {
-                    last_token.add(' ');
-                    idx += 1;
-                }
-                (Some(' '), Some(next_letter), Some(Token::OpenTag(_)))
-                | (Some(' '), Some(next_letter), Some(Token::AttributeValue(_)))
-                    if next_letter != '/' && next_letter != ' ' =>
-                {
-                    self.tokens.push(Token::AttributeKey(String::new()));
-                    reading = true;
-                    idx += 1;
-                }
-                (Some(letter), _, _) if !reading => {
-                    if self.is_jsx {
-                        self.tokens.push(Token::JSXText(String::from(letter)));
-                    } else {
-                        self.tokens.push(Token::Text(String::from(letter)));
-                    }
-
-                    reading = true;
-                    idx += 1;
-                }
-                (Some(letter), _, Some(last_token)) => {
-                    last_token.add(letter);
-                    idx += 1;
+                Some('}') => {
+                    count -= 1;
                 }
                 _ => {}
             }
-        }
-    }
-}
 
-#[derive(PartialEq, Debug, Clone)]
-pub enum Token {
-    Text(String),
-    JSXText(String),
-    Signal(String),
-    OpenTag(String),
-    CloseTag(String),
-    CloseSignal(String),
-    SelfCloseTag(String),
-    AttributeKey(String),
-    AttributeValue(String),
-}
+            if count == 0 {
+                let end = self.tokenize(block.clone(), true);
+                let code = block[end..].to_string();
+                if code.len() > 0 {
+                    self.tokens.push(Token::Code(code));
+                }
 
-impl Token {
-    fn add(&mut self, c: char) {
-        match *self {
-            Token::Text(ref mut s)
-            | Token::Signal(ref mut s)
-            | Token::JSXText(ref mut s)
-            | Token::OpenTag(ref mut s)
-            | Token::CloseTag(ref mut s)
-            | Token::CloseSignal(ref mut s)
-            | Token::SelfCloseTag(ref mut s)
-            | Token::AttributeKey(ref mut s)
-            | Token::AttributeValue(ref mut s) => {
-                *s = String::from(s.clone()) + &String::from(c);
+                break (block, i + 1);
+            } else {
+                block += &String::from(current_letter.unwrap());
+                i += 1;
             }
         }
     }
 
-    fn convert_to_self_close_tag(&mut self) {
-        if let Token::OpenTag(tag) = &*self {
-            *self = Token::SelfCloseTag(tag.clone());
+    pub fn read_tag(&mut self, code: String) -> (String, usize, bool) {
+        let mut i = 0;
+        let mut tag = "".to_string();
+
+        loop {
+            let current_letter = code.chars().nth(i);
+            let next_letter = code.chars().nth(i + 1);
+
+            match (current_letter, next_letter) {
+                (Some('/'), Some('>')) => {
+                    i += 2;
+                    break (tag, i, true);
+                }
+                (Some('>'), _) => {
+                    i += 1;
+                    break (tag, i, false);
+                }
+                (Some(' '), _) => {
+                    break (tag, i, false);
+                }
+                _ => {
+                    tag += &String::from(current_letter.unwrap());
+                    i += 1;
+                }
+            }
+        }
+    }
+
+    pub fn read_attrbute_key(&mut self, code: String) -> (String, usize) {
+        let mut i = 1;
+        let mut key = "".to_string();
+
+        loop {
+            let current_letter = code.chars().nth(i);
+            let next_letter = code.chars().nth(i + 1);
+
+            match (current_letter, next_letter) {
+                (Some('='), _) => {
+                    // i += 1;
+                    break (key, i);
+                }
+                _ => {
+                    key += &String::from(current_letter.unwrap());
+                    i += 1;
+                }
+            }
+        }
+    }
+    pub fn read_attrbute_value(&mut self, code: String) -> (String, usize) {
+        let mut i = 1;
+        let mut value = "".to_string();
+
+        loop {
+            let current_letter = code.chars().nth(i);
+            let next_letter = code.chars().nth(i + 1);
+
+            match (current_letter, next_letter) {
+                (Some(' '), _) | (Some('>'), _) => {
+                    i += 1;
+                    break (value, i);
+                }
+                (Some('{'), _) => {
+                    let (block, end) = self.read_block(code[i..].to_string());
+                    self.tokens.pop(); // 要出栈一个 code
+                    i += end;
+                    break (block, i);
+                }
+                _ => {
+                    value += &String::from(current_letter.unwrap());
+                    i += 1;
+                }
+            }
+        }
+    }
+    pub fn read_text(&mut self, code: String) -> (String, usize) {
+        let mut i = 0;
+        let mut value = "".to_string();
+
+        loop {
+            let current_letter = code.chars().nth(i);
+
+            match current_letter {
+                Some('{') | Some('<') => {
+                    break (value, i);
+                }
+                None => {
+                    break (value, i);
+                }
+                _ => {
+                    value += &String::from(current_letter.unwrap());
+                    i += 1;
+                }
+            }
         }
     }
 }

@@ -22,6 +22,7 @@ impl Node {
 #[derive(Clone, Debug)]
 pub struct Parser {
     pub lexer: Lexer,
+    pub code: String,
     pub reading: bool,
 }
 
@@ -29,22 +30,22 @@ impl Parser {
     pub fn new(code: &str) -> Parser {
         Parser {
             reading: false,
+            code: code.to_string(),
             lexer: Lexer::new(code),
         }
     }
 
     pub fn parse_all(&mut self) -> Result<Node, ()> {
-        self.lexer.tokenize_all();
-        let (childs, _, _) = self.parse_schild(self.lexer.tokens.clone());
+        self.lexer.tokenize(self.code.to_string(),false);
+        let (childs, _, _) = self.parse_child(self.lexer.tokens.clone());
         let mut node = Node::new("root".to_string());
         for child in childs {
             node.children.push(child);
         }
-
         return Ok(node);
     }
 
-    pub fn parse_schild(
+    pub fn parse_child(
         &mut self,
         mut slice_tokens: Vec<Token>,
     ) -> (Vec<Node>, usize, Vec<(String, String)>) {
@@ -65,7 +66,7 @@ impl Parser {
 
                         let tokens = slice_tokens[idx..].to_vec();
 
-                        let (childs, readed, props) = self.parse_schild(tokens);
+                        let (childs, readed, props) = self.parse_child(tokens);
 
                         for child in childs {
                             node.children.push(child)
@@ -93,7 +94,7 @@ impl Parser {
                         let mut node = Node::new(s.to_string());
                         idx += 1;
                         let tokens = slice_tokens[idx..].to_vec();
-                        let (childs, readed, props) = self.parse_schild(tokens);
+                        let (childs, readed, props) = self.parse_child(tokens);
 
                         for child in childs {
                             node.children.push(child)
@@ -119,30 +120,17 @@ impl Parser {
                         n.kind = 2;
                         parsed.push(n);
                     }
-                    Token::Signal(t) => {
-                        idx += 1;
-                        let mut n = Node::new(t.to_string());
-                        let tokens = slice_tokens[idx..].to_vec();
-                        let (childs, readed, _) = self.parse_schild(tokens);
-
-                        for child in childs {
-                            n.children.push(child)
+                    Token::Code(t) => {
+                        if self.reading {
+                            self.reading = false;
+                            break (parsed, idx, props);
                         }
-                        n.kind = 3;
-                        idx += readed;
-                        parsed.push(n);
-                    }
-                    Token::CloseSignal(_) => {
                         idx += 1;
-                        break (parsed, idx, props);
-                    }
-                    Token::JSXText(t) => {
-                        idx += 1;
-                        let mut n = Node::new(t.to_string());
-                        n.kind = 4;
-                        parsed.push(n);
-                    }
 
+                        let mut n = Node::new(t.to_string());
+                        n.kind = 3;
+                        parsed.push(n);
+                    }
                     _ => {
                         idx += 1;
                     }
