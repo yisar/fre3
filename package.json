@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/yisar/fre3#readme",
   "dependencies": {
+    "sinuous": "0.30.0",
     "vite": "^4.4.9"
   }
 }

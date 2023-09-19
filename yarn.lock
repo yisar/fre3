@@ -171,6 +171,11 @@ rollup@^3.27.1:
   optionalDependencies:
     fsevents "~2.3.2"
 
+sinuous@0.30.0:
+  version "0.30.0"
+  resolved "https://registry.npmmirror.com/sinuous/-/sinuous-0.30.0.tgz#b00ba58ae608493b3d2964fd10e92c0c66637e46"
+  integrity sha512-8mj2hDw1tMZGNxJ/2BSQnjt+EBe0kXSyu/TWxCeH9ZmmyJBYnPH74vGhTWb419w+rgjlg0bAIY0STFV41FLMSw==
+
 source-map-js@^1.0.2:
   version "1.0.2"
   resolved "https://registry.npmmirror.com/source-map-js/-/source-map-js-1.0.2.tgz#adbc361d9c62df380125e7f161f71c826f1e490c"
