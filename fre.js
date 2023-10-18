@@ -113,7 +113,7 @@ function mountAttributes(dom, props, isSvg) {
     }
 }
 
-function patchAttributes(dom, newProps, oldProps, isSvg) {
+function reconcileAttributes(dom, newProps, oldProps, isSvg) {
     for (var key in newProps) {
         if (key === "key" || key === "children") continue
         var oldValue = oldProps[key]
@@ -209,7 +209,7 @@ function mount(vnode, isSvg) {
     }
 }
 
-function patch(
+function reconcile(
     parent,
     newVnode,
     oldVnode,
@@ -231,7 +231,7 @@ function patch(
         if (newVnode.type === "svg") {
             isSvg = true
         }
-        patchAttributes(ref.node, newVnode.props, oldVnode.props, isSvg)
+        reconcileAttributes(ref.node, newVnode.props, oldVnode.props, isSvg)
         let oldChildren = oldVnode.props.children
         let newChildren = newVnode.props.children
         if (oldChildren == null) {
@@ -244,7 +244,7 @@ function patch(
                 ref.node.textContent = ""
                 ref.children = null
             } else {
-                ref.children = patchInPlace(
+                ref.children = reconcile(
                     ref.node,
                     newChildren,
                     oldChildren,
@@ -255,7 +255,7 @@ function patch(
         }
         return ref
     } else if (isNonEmptyArray(newVnode) && isNonEmptyArray(oldVnode)) {
-        patchChildren(parent, newVnode, oldVnode, ref, isSvg)
+        reconcileChildren(parent, newVnode, oldVnode, ref, isSvg)
         return ref
     } else if (
         isComponent(newVnode) &&
@@ -271,7 +271,7 @@ function patch(
             currentVnode = newVnode
             let childVnode = fn(newVnode.props)
             cursor = 0
-            let childRef = patch(
+            let childRef = reconcile(
                 parent,
                 childVnode,
                 ref.childVnode,
@@ -299,17 +299,7 @@ function patch(
     }
 }
 
-function patchInPlace(parent, newVnode, oldVnode, ref, isSvg) {
-    const newRef = patch(parent, newVnode, oldVnode, ref, isSvg)
-    if (newRef !== ref) {
-        replaceDom(parent, newRef, ref)
-    }
-    return newRef
-}
-
-function patchChildren(parent, newChildren, oldchildren, ref, isSvg) {
-    // We need to retreive the next sibling before the old children
-    // get eventually removed from the current DOM document
+function reconcileChildren(parent, newChildren, oldchildren, ref, isSvg) {
     const nextNode = getNextSibling(ref)
     const children = Array(newChildren.length)
     let refChildren = ref.children
@@ -333,7 +323,7 @@ function patchChildren(parent, newChildren, oldchildren, ref, isSvg) {
         newVnode = newChildren[newStart]
         if (newVnode?.key === oldVnode?.key) {
             oldRef = refChildren[oldStart]
-            newRef = children[newStart] = patchInPlace(
+            newRef = children[newStart] = reconcile(
                 parent,
                 newVnode,
                 oldVnode,
@@ -349,7 +339,7 @@ function patchChildren(parent, newChildren, oldchildren, ref, isSvg) {
         newVnode = newChildren[newEnd]
         if (newVnode?.key === oldVnode?.key) {
             oldRef = refChildren[oldEnd]
-            newRef = children[newEnd] = patchInPlace(
+            newRef = children[newEnd] = reconcile(
                 parent,
                 newVnode,
                 oldVnode,
@@ -376,7 +366,7 @@ function patchChildren(parent, newChildren, oldchildren, ref, isSvg) {
         if (idx != null) {
             oldVnode = oldchildren[idx]
             oldRef = refChildren[idx]
-            newRef = children[newStart] = patch(
+            newRef = children[newStart] = reconcile(
                 parent,
                 newVnode,
                 oldVnode,
@@ -430,7 +420,7 @@ function render(vnode, parent) {
         parent.textContent = ""
         insertDom(parent, ref, null)
     } else {
-        rootRef.ref = patchInPlace(
+        rootRef.ref = reconcile(
             parent,
             vnode,
             rootRef.vnode,
