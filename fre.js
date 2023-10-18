@@ -103,12 +103,9 @@ function reconcileAttributes(dom, newProps, oldProps, isSvg) {
         }
     }
     for (key in oldProps) {
-        if (
-            key === "key" ||
-            key === "children" ||
-            key in newProps
-        )
+        if (key === "key" || key === "children" || key in newProps) {
             continue
+        }
         if (key[0] === 'o' && key[1] === 'n') {
             dom[key.toLowerCase()] = null
         } else {
@@ -123,11 +120,7 @@ function setDOMAttribute(el, name, value, isSvg) {
     } else if (value === false) {
         el.removeAttribute(name)
     } else {
-        if (isSvg) {
-            el[name] = value
-        } else {
-            el.setAttribute(name, value)
-        }
+        isSvg ? (el[name] = value) : el.setAttribute(name, value)
     }
 }
 
