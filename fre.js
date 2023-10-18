@@ -19,7 +19,7 @@ function h(type, props, ...children) {
     props = props || {}
 
     if (children.length) {
-        props.children = kids.length === 1 ? kids[0] : kids
+        props.children = children.length === 1 ? children[0] : children
     }
 
     const vtype =
