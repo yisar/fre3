@@ -154,9 +154,9 @@ function mount(vnode, isSvg) {
         for (var key in props) {
             if (key === "key" || key === "children") continue
             if (key[0] === 'o' && key[1] === 'n') {
-                dom[key.toLowerCase()] = props[key]
+                node[key.toLowerCase()] = props[key]
             } else {
-                setDOMAttribute(dom, key, props[key], isSvg)
+                setDOMAttribute(node, key, props[key], isSvg)
             }
         }
 
@@ -286,103 +286,103 @@ function reconcileChildren(parent, newCh, oldch, ref, isSvg) {
     const nextNode = getNextSibling(ref)
     const children = Array(newCh.length)
     let refChildren = ref.children
-    let newStart = 0,
-        oldStart = 0,
-        newEnd = newCh.length - 1,
-        oldEnd = oldch.length - 1
+    let newHead = 0,
+        oldHead = 0,
+        newTail = newCh.length - 1,
+        oldTail = oldch.length - 1
     let oldVnode, newVnode, oldRef, newRef, refMap
 
-    while (newStart <= newEnd && oldStart <= oldEnd) {
-        if (refChildren[oldStart] === null) {
-            oldStart++
+    while (newHead <= newTail && oldHead <= oldTail) {
+        if (refChildren[oldHead] === null) {
+            oldHead++
             continue
         }
-        if (refChildren[oldEnd] === null) {
-            oldEnd--
+        if (refChildren[oldTail] === null) {
+            oldTail--
             continue
         }
 
-        oldVnode = oldch[oldStart]
-        newVnode = newCh[newStart]
+        oldVnode = oldch[oldHead]
+        newVnode = newCh[newHead]
         if (newVnode?.key === oldVnode?.key) {
-            oldRef = refChildren[oldStart]
-            newRef = children[newStart] = reconcile(
+            oldRef = refChildren[oldHead]
+            newRef = children[newHead] = reconcile(
                 parent,
                 newVnode,
                 oldVnode,
                 oldRef,
                 isSvg
             )
-            newStart++
-            oldStart++
+            newHead++
+            oldHead++
             continue
         }
 
-        oldVnode = oldch[oldEnd]
-        newVnode = newCh[newEnd]
+        oldVnode = oldch[oldTail]
+        newVnode = newCh[newTail]
         if (newVnode?.key === oldVnode?.key) {
-            oldRef = refChildren[oldEnd]
-            newRef = children[newEnd] = reconcile(
+            oldRef = refChildren[oldTail]
+            newRef = children[newTail] = reconcile(
                 parent,
                 newVnode,
                 oldVnode,
                 oldRef,
                 isSvg
             )
-            newEnd--
-            oldEnd--
+            newTail--
+            oldTail--
             continue
         }
 
         if (refMap == null) {
             refMap = {}
-            for (let i = oldStart; i <= oldEnd; i++) {
+            for (let i = oldHead; i <= oldTail; i++) {
                 oldVnode = oldch[i]
                 if (oldVnode?.key != null) {
                     refMap[oldVnode.key] = i
                 }
             }
         }
-        newVnode = newCh[newStart]
+        newVnode = newCh[newHead]
         const idx = newVnode?.key != null ? refMap[newVnode.key] : null
         if (idx != null) {
             oldVnode = oldch[idx]
             oldRef = refChildren[idx]
-            newRef = children[newStart] = reconcile(
+            newRef = children[newHead] = reconcile(
                 parent,
                 newVnode,
                 oldVnode,
                 oldRef,
                 isSvg
             )
-            insertDom(parent, newRef, getDomNode(refChildren[oldStart]))
+            insertDom(parent, newRef, getDomNode(refChildren[oldHead]))
             if (newRef !== oldRef) {
                 removeDom(parent, oldRef)
             }
             refChildren[idx] = null
         } else {
-            newRef = children[newStart] = mount(newVnode, isSvg)
-            insertDom(parent, newRef, getDomNode(refChildren[oldStart]))
+            newRef = children[newHead] = mount(newVnode, isSvg)
+            insertDom(parent, newRef, getDomNode(refChildren[oldHead]))
         }
-        newStart++
+        newHead++
     }
 
     const beforeNode =
-        newEnd < newCh.length - 1
-            ? getDomNode(children[newEnd + 1])
+        newTail < newCh.length - 1
+            ? getDomNode(children[newTail + 1])
             : nextNode
-    while (newStart <= newEnd) {
-        const newRef = mount(newCh[newStart], isSvg)
-        children[newStart] = newRef
+    while (newHead <= newTail) {
+        const newRef = mount(newCh[newHead], isSvg)
+        children[newHead] = newRef
         insertDom(parent, newRef, beforeNode)
-        newStart++
+        newHead++
     }
-    while (oldStart <= oldEnd) {
-        oldRef = refChildren[oldStart]
+    while (oldHead <= oldTail) {
+        oldRef = refChildren[oldHead]
         if (oldRef != null) {
             removeDom(parent, oldRef)
         }
-        oldStart++
+        oldHead++
     }
     ref.children = children
 }
@@ -415,7 +415,7 @@ function useState(value) {
     const setter = (newValue) => {
         hook[0] = newValue
         c.dirty = true
-        render(c, rootRef)
+        requestAnimationFrame(() => render(c, rootRef))
     }
     if (hook.length === 0) {
         hook[0] = value
