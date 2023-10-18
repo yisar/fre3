@@ -3,7 +3,6 @@ const EMPTY_OBJECT = {}
 const VTYPE_ELEMENT = 1
 const VTYPE_FUNCTION = 2
 let cursor = 0
-let currentElement = null
 let currentVnode = null
 
 const isEmpty = (c) =>
@@ -210,12 +209,13 @@ function mount(vnode, isSvg) {
             children: vnode.map((child) => mount(child, isSvg)),
         }
     } else if (isRenderFunction(vnode)) {
+        currentVnode = vnode
 
         let childVnode = vnode.type(vnode.props)
-        let childRef = mount(childVnode, isSvg)
 
-        currentElement = childRef
-        currentVnode = childVnode
+        cursor = 0
+
+        let childRef = mount(childVnode, isSvg)
 
 
         return {
@@ -243,14 +243,12 @@ function patch(
     ref,
     isSvg
 ) {
-    if (oldVnode == null) {
-        const ref = mount(newVnode, isSvg)
-        parentDomNode.textContent = ""
-        insertDom(parentDomNode, ref, null)
-        return ref
-    } else if (oldVnode === newVnode) {
-        return ref
-    } else if (isEmpty(newVnode) && isEmpty(oldVnode)) {
+
+    // if (oldVnode === newVnode) {
+    //     return ref
+    // } else 
+
+    if (isEmpty(newVnode) && isEmpty(oldVnode)) {
         return ref
     } else if (isLeaf(newVnode) && isLeaf(oldVnode)) {
         ref.node.nodeValue = newVnode
@@ -299,8 +297,11 @@ function patch(
             renderFn.shouldUpdate != null
                 ? renderFn.shouldUpdate(oldVnode.props, newVnode.props)
                 : defaultShouldUpdate(oldVnode.props, newVnode.props)
+
         if (shouldUpdate) {
+            currentVnode = newVnode
             let childVnode = renderFn(newVnode.props)
+            cursor = 0
             let childRef = patch(
                 parentDomNode,
                 childVnode,
@@ -308,6 +309,7 @@ function patch(
                 ref.childRef,
                 isSvg
             )
+            currentElement = childRef
             if (childRef !== ref.childRef) {
                 return {
                     type: REF_PARENT,
@@ -446,6 +448,7 @@ function patchChildren(parentDomNode, newChildren, oldchildren, ref, isSvg) {
 }
 
 function defaultShouldUpdate(p1, p2) {
+    return true
     if (p1 === p2) return false
     for (let key in p2) {
         if (p1[key] !== p2[key]) return true
@@ -454,14 +457,47 @@ function defaultShouldUpdate(p1, p2) {
 }
 
 function render(vnode, parentDomNode) {
-    patch(parentDomNode, vnode, vdom, null, false)
+    let rootRef = parentDomNode.$$PETIT_DOM_REF
+    if (rootRef == null) {
+        const ref = mount(vnode, false)
+        parentDomNode.$$PETIT_DOM_REF = { ref, vnode }
+        parentDomNode.textContent = ""
+        insertDom(parentDomNode, ref, null)
+    } else {
+        rootRef.ref = patchInPlace(
+            parentDomNode,
+            vnode,
+            rootRef.vnode,
+            rootRef.ref,
+            false
+        )
+        rootRef.vnode = vnode
+
+    }
 }
 
-function useState(value){
-    return [value, ()=>{
-        console.log(currentElement, currentVnode)
-        patch(currentElement, )
-    }]
+function useState(value) {
+    const hook = getHook(cursor++)
+    const setter = (newValue) => {
+        hook[0] = newValue
+        render(currentVnode, document.body)
+    }
+    if (hook.length === 0) {
+        hook[0] = value
+        hook[1] = setter
+    }
+    return hook
+}
+
+export const getHook = (
+    cursor
+) => {
+    const hooks =
+        currentVnode.hooks || (currentVnode.hooks = { list: [], effect: [], layout: [] })
+    if (cursor >= hooks.list.length) {
+        hooks.list.push([])
+    }
+    return hooks.list[cursor]
 }
 
 export { Fragment, getParentNode, h, render, useState }
