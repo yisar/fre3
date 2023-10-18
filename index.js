@@ -13,6 +13,7 @@ export const h = (...args) => {
         } else if (Array.isArray(arg)) {
             // fragments
             if (!el) el = document.createDocumentFragment()
+            //map
             arg.forEach(item)
         } else if (arg instanceof Node) {
             if (el == null) {
@@ -24,8 +25,23 @@ export const h = (...args) => {
             // props
             property(el, arg)
         } else if (typeof arg === 'function') {
-            console.log(el)
-            el = arg.apply(null, args.splice(1))
+            if (el) {
+                //signal
+                let oldNode = null
+                effect(() => {
+                    let newNode = document.createTextNode(arg())
+                    if (oldNode == null) {
+                        el.appendChild(newNode)
+                    } else {
+                        el.replaceChild(newNode, oldNode)
+                    }
+                    oldNode = newNode
+
+                })
+            } else {
+                el = arg.apply(null, args.splice(1))
+            }
+
         } else {
             el.appendChild(document.createTextNode('' + arg)) // 1 true null
         }
@@ -47,7 +63,7 @@ const property = (el, name, value) => {
             if (k[0] === "-") {
                 el[name].setProperty(k, value)
             } else {
-                
+
                 el[name][k] = value
             }
         }
@@ -67,4 +83,32 @@ const property = (el, name, value) => {
     } else {
         el.setAttribute(name, value)
     }
+}
+
+let listener = null
+export function signal(initialValue) {
+    let value = initialValue
+    const listeners = []
+
+    function signal(newValue) {
+        if (newValue) {
+            value = newValue
+            console.log(listeners)
+            listeners.forEach(t => t())
+        } else {
+            if (listener && !listeners.includes(listener)) {
+                listeners.push(listener)
+            }
+            return value
+        }
+    }
+
+
+    return signal
+}
+
+export function effect(func) {
+    listener = func
+    func()
+    // listener = undefined
 }

@@ -73,6 +73,7 @@ function computed(observer, value) {
     _unsubscribe(update);
     update._fresh = true;
     tracking = update;
+    console.log(observer)
     value = observer(value);
 
     tracking = prevTracking;

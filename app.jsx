@@ -1,11 +1,10 @@
-import { h } from "./signal";
-import { observable } from './signal'
+import { h, signal } from "./index";
 
-const counter = observable(0);
 
-const jsxView = () => {
-    return <div>Counter {counter}</div>;
+const App = () => {
+    const [count, setCount] = useState(0)
+    return <button onClick={() => setCount(count+1)}>
+        count
+    </button>
 };
-document.body.append(jsxView());
-
-setInterval(() => counter(counter() + 1), 1000);
+document.body.append(<App/>)
