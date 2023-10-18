@@ -1,10 +1,9 @@
-import { h, signal } from "./index";
+import { h, render } from './ignore/petit'
 
 
 const App = () => {
-    const [count, setCount] = useState(0)
-    return <button onClick={() => setCount(count+1)}>
+    return <button>
         count
     </button>
 };
-document.body.append(<App/>)
+render(<App/>,document.body)
