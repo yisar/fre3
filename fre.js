@@ -172,6 +172,12 @@ function mount(vnode, isSvg) {
         cursor = 0
 
         let childRef = mount(childVnode, isSvg)
+
+        if (vnode.hooks) {
+            sideEffect(vnode.hooks.layout)
+            setTimeout(() => sideEffect(vnode.hooks.effect), 0)
+        }
+
         return {
             type: REF_PARENT,
             childRef,
@@ -236,6 +242,7 @@ function reconcile(
         isComponent(oldVnode) &&
         newVnode.type === oldVnode.type
     ) {
+
         let fn = newVnode.type
         let shouldUpdate = newVnode.dirty || (fn.shouldUpdate != null
             ? fn.shouldUpdate(oldVnode.props, newVnode.props)
@@ -252,6 +259,10 @@ function reconcile(
                 ref.childRef,
                 isSvg
             )
+            if (newVnode.hooks) {
+                sideEffect(newVnode.hooks.layout)
+                setTimeout(() => sideEffect(newVnode.hooks.effect), 0)
+            }
             if (childRef !== ref.childRef) {
                 return {
                     type: REF_PARENT,
@@ -271,6 +282,12 @@ function reconcile(
     } else {
         return mount(newVnode, isSvg)
     }
+}
+
+function sideEffect(effects) {
+    effects.forEach(e => e[2] && e[2]())
+    effects.forEach(e => (e[2] = e[0]()))
+    effects.length = 0
 }
 
 function reconcileChildren(parent, newCh, oldch, ref, isSvg) {
@@ -401,21 +418,72 @@ function render(vnode, parent) {
     }
 }
 
-function useState(value) {
+const useState = (initState) => {
+    return useReducer(null, initState)
+}
+
+const useReducer = (
+    reducer,
+    initState
+) => {
     const [hook, c] = getHook(cursor++)
-    const setter = (newValue) => {
-        hook[0] = newValue
-        c.dirty = true
-        requestAnimationFrame(() => render(c, rootRef))
-    }
     if (hook.length === 0) {
-        hook[0] = value
-        hook[1] = setter
+        hook[0] = initState
+        hook[1] = (value) => {
+            let v = reducer
+                ? reducer(hook[0], value)
+                : typeof value === 'function'
+                    ? value(hook[0])
+                    : value
+            if (hook[0] !== v) {
+                hook[0] = v
+                c.dirty = true
+                requestAnimationFrame(() => render(c, rootRef))
+            }
+        }
     }
     return hook
 }
 
-export const getHook = (
+const useEffect = (cb, deps) => {
+    return effectImpl(cb, deps, "effect")
+}
+
+const useLayout = (cb, deps) => {
+    return effectImpl(cb, deps, "layout")
+}
+
+const effectImpl = (cb, deps, key) => {
+    const [hook, current] = getHook(cursor++)
+    if (isChanged(hook[1], deps)) {
+        hook[0] = cb
+        hook[1] = deps
+        current.hooks[key].push(hook)
+    }
+}
+
+const useMemo = (cb, deps) => {
+    const hook = getHook(cursor++)[0]
+    if (isChanged(hook[1], deps)) {
+        hook[1] = deps
+        return (hook[0] = cb())
+    }
+    return hook[0]
+}
+
+const useCallback = (cb, deps) => {
+    return useMemo(() => cb, deps)
+}
+
+const useRef = (current) => {
+    return useMemo(() => ({ current }), [])
+}
+
+const isChanged = (a, b) => {
+    return !a || a.length !== b.length || b.some((arg, index) => !Object.is(arg, a[index]))
+}
+
+const getHook = (
     cursor
 ) => {
     const hooks =
@@ -426,4 +494,4 @@ export const getHook = (
     return [hooks.list[cursor], currentVnode]
 }
 
-export { Fragment, getParentNode, h, render, useState }
+export { Fragment, getParentNode, h, render, useState, useEffect, useLayout, useCallback, useMemo, useReducer, useRef }
