@@ -211,9 +211,7 @@ function reconcile(
         isElement(oldVnode) &&
         newVnode.type === oldVnode.type
     ) {
-        if (newVnode.type === "svg") {
-            isSvg = true
-        }
+        isSvg = isSvg || newVnode.type === 'svg'
         reconcileAttributes(ref.node, newVnode.props, oldVnode.props, isSvg)
         let oldCh = oldVnode.props.children
         let newCh = newVnode.props.children
