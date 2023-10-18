@@ -2,6 +2,11 @@ const EMPTY_OBJECT = {}
 
 const VTYPE_ELEMENT = 1
 const VTYPE_FUNCTION = 2
+const REF_SINGLE = 1
+const REF_ARRAY = 4
+const REF_PARENT = 8
+
+
 let cursor = 0
 let currentVnode = null
 
@@ -27,8 +32,8 @@ function h(type, props, ...children) {
             ? VTYPE_ELEMENT
             : typeof type === "function"
                 ? VTYPE_FUNCTION
-                : undefined
-    if (vtype === undefined) throw new Error("Invalid Vnode type")
+                : 0
+
     return {
         vtype,
         type,
@@ -40,10 +45,6 @@ function h(type, props, ...children) {
 function Fragment(props) {
     return props.children
 }
-
-const REF_SINGLE = 1 // ref with a single dom node
-const REF_ARRAY = 4 // ref with an array od nodes
-const REF_PARENT = 8 // ref with a child ref
 
 function getDomNode(ref) {
     if (ref.type === REF_SINGLE) {
@@ -100,27 +101,27 @@ function replaceDom(parent, newRef, oldRef) {
     removeDom(parent, oldRef)
 }
 
-function mountAttributes(domElement, props, isSvg) {
+function mountAttributes(dom, props, isSvg) {
     for (var key in props) {
         if (key === "key" || key === "children") continue
-        if (key.startsWith("on")) {
-            domElement[key.toLowerCase()] = props[key]
+        if (key[0] === 'o' && key[1] === 'n') {
+            dom[key.toLowerCase()] = props[key]
         } else {
-            setDOMAttribute(domElement, key, props[key], isSvg)
+            setDOMAttribute(dom, key, props[key], isSvg)
         }
     }
 }
 
-function patchAttributes(domElement, newProps, oldProps, isSvg) {
+function patchAttributes(dom, newProps, oldProps, isSvg) {
     for (var key in newProps) {
         if (key === "key" || key === "children") continue
         var oldValue = oldProps[key]
         var newValue = newProps[key]
         if (oldValue !== newValue) {
-            if (key.startsWith("on")) {
-                domElement[key.toLowerCase()] = newValue
+            if (key[0] === 'o' && key[1] === 'n') {
+                dom[key.toLowerCase()] = newValue
             } else {
-                setDOMAttribute(domElement, key, newValue, isSvg.isSVG)
+                setDOMAttribute(dom, key, newValue, isSvg.isSVG)
             }
         }
     }
@@ -131,24 +132,24 @@ function patchAttributes(domElement, newProps, oldProps, isSvg) {
             key in newProps
         )
             continue
-        if (key.startsWith("on")) {
-            domElement[key.toLowerCase()] = null
+        if (key[0] === 'o' && key[1] === 'n') {
+            dom[key.toLowerCase()] = null
         } else {
-            domElement.removeAttribute(key)
+            dom.removeAttribute(key)
         }
     }
 }
 
-function setDOMAttribute(el, attr, value, isSvg) {
+function setDOMAttribute(el, name, value, isSvg) {
     if (value === true) {
-        el.setAttribute(attr, "")
+        el.setAttribute(name, "")
     } else if (value === false) {
-        el.removeAttribute(attr)
+        el.removeAttribute(name)
     } else {
         if (isSvg) {
-            el[attr, value]
+            el[name] = value
         } else {
-            el.setAttribute(attr, value)
+            el.setAttribute(name, value)
         }
     }
 }
@@ -173,9 +174,7 @@ function mount(vnode, isSvg) {
             node = document.createElementNS("http://www.w3.org/2000/svg", type)
         }
         mountAttributes(node, props, isSvg)
-        let childrenRef =
-            props.children == null ? props.children : mount(props.children, isSvg)
-
+        let childrenRef = props.children == null ? null : mount(props.children, isSvg)
         if (childrenRef != null) insertDom(node, childrenRef)
         return {
             type: REF_SINGLE,
@@ -208,13 +207,12 @@ function mount(vnode, isSvg) {
 }
 
 function patch(
-    parentDomNode,
+    parent,
     newVnode,
     oldVnode,
     ref,
     isSvg
 ) {
-
     if (oldVnode === newVnode && !newVnode.props.dirty) {
         return ref
     } else if (isEmpty(newVnode) && isEmpty(oldVnode)) {
@@ -254,7 +252,7 @@ function patch(
         }
         return ref
     } else if (isNonEmptyArray(newVnode) && isNonEmptyArray(oldVnode)) {
-        patchChildren(parentDomNode, newVnode, oldVnode, ref, isSvg)
+        patchChildren(parent, newVnode, oldVnode, ref, isSvg)
         return ref
     } else if (
         isRenderFunction(newVnode) &&
@@ -272,7 +270,7 @@ function patch(
             let childVnode = renderFn(newVnode.props)
             cursor = 0
             let childRef = patch(
-                parentDomNode,
+                parent,
                 childVnode,
                 ref.childState,
                 ref.childRef,
@@ -299,15 +297,15 @@ function patch(
     }
 }
 
-function patchInPlace(parentDomNode, newVnode, oldVnode, ref, isSvg) {
-    const newRef = patch(parentDomNode, newVnode, oldVnode, ref, isSvg)
+function patchInPlace(parent, newVnode, oldVnode, ref, isSvg) {
+    const newRef = patch(parent, newVnode, oldVnode, ref, isSvg)
     if (newRef !== ref) {
-        replaceDom(parentDomNode, newRef, ref)
+        replaceDom(parent, newRef, ref)
     }
     return newRef
 }
 
-function patchChildren(parentDomNode, newChildren, oldchildren, ref, isSvg) {
+function patchChildren(parent, newChildren, oldchildren, ref, isSvg) {
     // We need to retreive the next sibling before the old children
     // get eventually removed from the current DOM document
     const nextNode = getNextSibling(ref)
@@ -334,7 +332,7 @@ function patchChildren(parentDomNode, newChildren, oldchildren, ref, isSvg) {
         if (newVnode?.key === oldVnode?.key) {
             oldRef = refChildren[oldStart]
             newRef = children[newStart] = patchInPlace(
-                parentDomNode,
+                parent,
                 newVnode,
                 oldVnode,
                 oldRef,
@@ -350,7 +348,7 @@ function patchChildren(parentDomNode, newChildren, oldchildren, ref, isSvg) {
         if (newVnode?.key === oldVnode?.key) {
             oldRef = refChildren[oldEnd]
             newRef = children[newEnd] = patchInPlace(
-                parentDomNode,
+                parent,
                 newVnode,
                 oldVnode,
                 oldRef,
@@ -377,20 +375,20 @@ function patchChildren(parentDomNode, newChildren, oldchildren, ref, isSvg) {
             oldVnode = oldchildren[idx]
             oldRef = refChildren[idx]
             newRef = children[newStart] = patch(
-                parentDomNode,
+                parent,
                 newVnode,
                 oldVnode,
                 oldRef,
                 isSvg
             )
-            insertDom(parentDomNode, newRef, getDomNode(refChildren[oldStart]))
+            insertDom(parent, newRef, getDomNode(refChildren[oldStart]))
             if (newRef !== oldRef) {
-                removeDom(parentDomNode, oldRef)
+                removeDom(parent, oldRef)
             }
             refChildren[idx] = null
         } else {
             newRef = children[newStart] = mount(newVnode, isSvg)
-            insertDom(parentDomNode, newRef, getDomNode(refChildren[oldStart]))
+            insertDom(parent, newRef, getDomNode(refChildren[oldStart]))
         }
         newStart++
     }
@@ -402,13 +400,13 @@ function patchChildren(parentDomNode, newChildren, oldchildren, ref, isSvg) {
     while (newStart <= newEnd) {
         const newRef = mount(newChildren[newStart], isSvg)
         children[newStart] = newRef
-        insertDom(parentDomNode, newRef, beforeNode)
+        insertDom(parent, newRef, beforeNode)
         newStart++
     }
     while (oldStart <= oldEnd) {
         oldRef = refChildren[oldStart]
         if (oldRef != null) {
-            removeDom(parentDomNode, oldRef)
+            removeDom(parent, oldRef)
         }
         oldStart++
     }
@@ -423,18 +421,17 @@ function defaultShouldUpdate(p1, p2) {
     return false
 }
 
-function render(vnode, parentDomNode) {
-    let rootRef = parentDomNode.$$PETIT_DOM_REF
+function render(vnode, parent) {
+    let rootRef = parent.$$PETIT_DOM_REF
     if (rootRef == null) {
-
         const ref = mount(vnode, false)
-        parentDomNode.$$PETIT_DOM_REF = { ref, vnode }
-        parentDomNode.textContent = ""
-        insertDom(parentDomNode, ref, null)
+        parent.$$PETIT_DOM_REF = { ref, vnode }
+        parent.textContent = ""
+        insertDom(parent, ref, null)
     } else {
         console.log(rootRef.vnode, vnode)
         rootRef.ref = patchInPlace(
-            parentDomNode,
+            parent,
             vnode,
             rootRef.vnode,
             rootRef.ref,
