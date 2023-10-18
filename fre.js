@@ -9,13 +9,14 @@ const REF_PARENT = 8
 
 let cursor = 0
 let currentVnode = null
+let rootRef = null
 
 const isEmpty = (c) =>
     c === null || (Array.isArray(c) && c.length === 0)
 const isNonEmptyArray = (c) => Array.isArray(c) && c.length > 0
 const isLeaf = (c) => typeof c === "string" || typeof c === "number"
 const isElement = (c) => c?.vtype === VTYPE_ELEMENT
-const isRenderFunction = (c) => c?.vtype === VTYPE_FUNCTION
+const isComponent = (c) => c?.vtype === VTYPE_FUNCTION
 
 function h(type, props, ...children) {
     props = props ?? EMPTY_OBJECT
@@ -186,7 +187,7 @@ function mount(vnode, isSvg) {
             type: REF_ARRAY,
             children: vnode.map((child) => mount(child, isSvg)),
         }
-    } else if (isRenderFunction(vnode)) {
+    } else if (isComponent(vnode)) {
         currentVnode = vnode
         let childVnode = vnode.type(vnode.props)
         cursor = 0
@@ -196,7 +197,7 @@ function mount(vnode, isSvg) {
         return {
             type: REF_PARENT,
             childRef,
-            childState: childVnode,
+            childVnode,
         }
     } else if (vnode instanceof Node) {
         return {
@@ -255,8 +256,8 @@ function patch(
         patchChildren(parent, newVnode, oldVnode, ref, isSvg)
         return ref
     } else if (
-        isRenderFunction(newVnode) &&
-        isRenderFunction(oldVnode) &&
+        isComponent(newVnode) &&
+        isComponent(oldVnode) &&
         newVnode.type === oldVnode.type
     ) {
         let renderFn = newVnode.type
@@ -272,7 +273,7 @@ function patch(
             let childRef = patch(
                 parent,
                 childVnode,
-                ref.childState,
+                ref.childVnode,
                 ref.childRef,
                 isSvg
             )
@@ -280,10 +281,10 @@ function patch(
                 return {
                     type: REF_PARENT,
                     childRef,
-                    childState: childVnode,
+                    childVnode,
                 }
             } else {
-                ref.childState = childVnode
+                ref.childVnode = childVnode
                 return ref
             }
         } else {
@@ -422,14 +423,12 @@ function defaultShouldUpdate(p1, p2) {
 }
 
 function render(vnode, parent) {
-    let rootRef = parent.$$PETIT_DOM_REF
     if (rootRef == null) {
         const ref = mount(vnode, false)
-        parent.$$PETIT_DOM_REF = { ref, vnode }
+        rootRef = { ref, vnode }
         parent.textContent = ""
         insertDom(parent, ref, null)
     } else {
-        console.log(rootRef.vnode, vnode)
         rootRef.ref = patchInPlace(
             parent,
             vnode,
