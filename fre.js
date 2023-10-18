@@ -189,6 +189,8 @@ function mount(vnode, isSvg) {
         }
     } else if (isComponent(vnode)) {
         currentVnode = vnode
+
+
         let childVnode = vnode.type(vnode.props)
         cursor = 0
 
@@ -214,7 +216,7 @@ function patch(
     ref,
     isSvg
 ) {
-    if (oldVnode === newVnode && !newVnode.props.dirty) {
+    if (oldVnode === newVnode && !newVnode.dirty) {
         return ref
     } else if (isEmpty(newVnode) && isEmpty(oldVnode)) {
         return ref
@@ -260,15 +262,14 @@ function patch(
         isComponent(oldVnode) &&
         newVnode.type === oldVnode.type
     ) {
-        let renderFn = newVnode.type
-        let shouldUpdate =
-            renderFn.shouldUpdate != null
-                ? newVnode.props.dirty || renderFn.shouldUpdate(oldVnode.props, newVnode.props)
-                : newVnode.props.dirty || defaultShouldUpdate(oldVnode.props, newVnode.props)
+        let fn = newVnode.type
+        let shouldUpdate = newVnode.dirty || (fn.shouldUpdate != null
+            ? fn.shouldUpdate(oldVnode.props, newVnode.props)
+            : defaultShouldUpdate(oldVnode.props, newVnode.props))
 
         if (shouldUpdate) {
             currentVnode = newVnode
-            let childVnode = renderFn(newVnode.props)
+            let childVnode = fn(newVnode.props)
             cursor = 0
             let childRef = patch(
                 parent,
@@ -441,11 +442,11 @@ function render(vnode, parent) {
 }
 
 function useState(value) {
-    const hook = getHook(cursor++)
+    const [hook, c] = getHook(cursor++)
     const setter = (newValue) => {
         hook[0] = newValue
-        currentVnode.props.dirty = true
-        render(currentVnode, document.body)
+        c.dirty = true
+        render(c, rootRef)
     }
     if (hook.length === 0) {
         hook[0] = value
@@ -462,7 +463,7 @@ export const getHook = (
     if (cursor >= hooks.list.length) {
         hooks.list.push([])
     }
-    return hooks.list[cursor]
+    return [hooks.list[cursor], currentVnode]
 }
 
 export { Fragment, getParentNode, h, render, useState }
