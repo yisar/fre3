@@ -138,11 +138,12 @@ function mount(vnode, isSvg) {
     } else if (isElement(vnode)) {
         let node
         let { type, props } = vnode
-        if (!isSvg) {
-            node = document.createElement(type)
-        } else {
-            node = document.createElementNS("http://www.w3.org/2000/svg", type)
-        }
+
+        isSvg = isSvg || type === 'svg'
+
+        node = isSvg ?
+            document.createElementNS("http://www.w3.org/2000/svg", type) :
+            document.createElement(type)
 
         for (var key in props) {
             if (key === "key" || key === "children") continue
@@ -171,7 +172,6 @@ function mount(vnode, isSvg) {
         cursor = 0
 
         let childRef = mount(childVnode, isSvg)
-
         return {
             type: REF_PARENT,
             childRef,
