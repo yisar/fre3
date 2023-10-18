@@ -2,14 +2,12 @@ import { h, render, useState } from './fre'
 
 
 const App = () => {
-    const [count, setCount] = useState([1,2,3])
+    const [count, setCount] = useState(0)
     console.log(count)
     return <div>
-        {count.map(i=>{
-            return <button onClick={() => setCount([1,3,2])} key={i}>
-            {i}
+        <button onClick={() => setCount(count + 1)}>
+            {count}
         </button>
-        })}
     </div>
 }
 render(<App />, document.body)

@@ -244,11 +244,9 @@ function patch(
     isSvg
 ) {
 
-    // if (oldVnode === newVnode) {
-    //     return ref
-    // } else 
-
-    if (isEmpty(newVnode) && isEmpty(oldVnode)) {
+    if (oldVnode === newVnode && !newVnode.props.dirty) {
+        return ref
+    } else if (isEmpty(newVnode) && isEmpty(oldVnode)) {
         return ref
     } else if (isLeaf(newVnode) && isLeaf(oldVnode)) {
         ref.node.nodeValue = newVnode
@@ -295,8 +293,8 @@ function patch(
         let renderFn = newVnode.type
         let shouldUpdate =
             renderFn.shouldUpdate != null
-                ? renderFn.shouldUpdate(oldVnode.props, newVnode.props)
-                : defaultShouldUpdate(oldVnode.props, newVnode.props)
+                ? newVnode.props.dirty || renderFn.shouldUpdate(oldVnode.props, newVnode.props)
+                : newVnode.props.dirty || defaultShouldUpdate(oldVnode.props, newVnode.props)
 
         if (shouldUpdate) {
             currentVnode = newVnode
@@ -309,7 +307,6 @@ function patch(
                 ref.childRef,
                 isSvg
             )
-            currentElement = childRef
             if (childRef !== ref.childRef) {
                 return {
                     type: REF_PARENT,
@@ -448,7 +445,6 @@ function patchChildren(parentDomNode, newChildren, oldchildren, ref, isSvg) {
 }
 
 function defaultShouldUpdate(p1, p2) {
-    return true
     if (p1 === p2) return false
     for (let key in p2) {
         if (p1[key] !== p2[key]) return true
@@ -459,11 +455,13 @@ function defaultShouldUpdate(p1, p2) {
 function render(vnode, parentDomNode) {
     let rootRef = parentDomNode.$$PETIT_DOM_REF
     if (rootRef == null) {
+        
         const ref = mount(vnode, false)
         parentDomNode.$$PETIT_DOM_REF = { ref, vnode }
         parentDomNode.textContent = ""
         insertDom(parentDomNode, ref, null)
     } else {
+        console.log(rootRef.vnode, vnode)
         rootRef.ref = patchInPlace(
             parentDomNode,
             vnode,
@@ -472,7 +470,6 @@ function render(vnode, parentDomNode) {
             false
         )
         rootRef.vnode = vnode
-
     }
 }
 
@@ -480,6 +477,7 @@ function useState(value) {
     const hook = getHook(cursor++)
     const setter = (newValue) => {
         hook[0] = newValue
+        currentVnode.props.dirty = true
         render(currentVnode, document.body)
     }
     if (hook.length === 0) {
