@@ -45,15 +45,6 @@ const REF_SINGLE = 1 // ref with a single dom node
 const REF_ARRAY = 4 // ref with an array od nodes
 const REF_PARENT = 8 // ref with a child ref
 
-const SVG_NS = "http://www.w3.org/2000/svg"
-
-const XLINK_NS = "http://www.w3.org/1999/xlink"
-const NS_ATTRS = {
-    show: XLINK_NS,
-    actuate: XLINK_NS,
-    href: XLINK_NS,
-}
-
 function getDomNode(ref) {
     if (ref.type === REF_SINGLE) {
         return ref.node
@@ -62,7 +53,6 @@ function getDomNode(ref) {
     } else if (ref.type === REF_PARENT) {
         return getDomNode(ref.childRef)
     }
-    throw new Error("Unkown ref type " + JSON.stringify(ref))
 }
 
 function getParentNode(ref) {
@@ -73,7 +63,6 @@ function getParentNode(ref) {
     } else if (ref.type === REF_PARENT) {
         return getParentNode(ref.childRef)
     }
-    throw new Error("Unkown ref type " + ref)
 }
 
 function getNextSibling(ref) {
@@ -84,20 +73,15 @@ function getNextSibling(ref) {
     } else if (ref.type === REF_PARENT) {
         return getNextSibling(ref.childRef)
     }
-    throw new Error("Unkown ref type " + JSON.stringify(ref))
 }
 
 function insertDom(parent, ref, nextSibling) {
     if (ref.type === REF_SINGLE) {
         parent.insertBefore(ref.node, nextSibling)
     } else if (ref.type === REF_ARRAY) {
-        ref.children.forEach((ch) => {
-            insertDom(parent, ch, nextSibling)
-        })
+        ref.children.forEach((ch) => insertDom(parent, ch, nextSibling))
     } else if (ref.type === REF_PARENT) {
         insertDom(parent, ref.childRef, nextSibling)
-    } else {
-        throw new Error("Unkown ref type " + JSON.stringify(ref))
     }
 }
 
@@ -105,13 +89,9 @@ function removeDom(parent, ref) {
     if (ref.type === REF_SINGLE) {
         parent.removeChild(ref.node)
     } else if (ref.type === REF_ARRAY) {
-        ref.children.forEach((ch) => {
-            removeDom(parent, ch)
-        })
+        ref.children.forEach((ch) => removeDom(parent, ch))
     } else if (ref.type === REF_PARENT) {
         removeDom(parent, ref.childRef)
-    } else {
-        throw new Error("Unkown ref type " + ref)
     }
 }
 
@@ -126,7 +106,7 @@ function mountAttributes(domElement, props, isSvg) {
         if (key.startsWith("on")) {
             domElement[key.toLowerCase()] = props[key]
         } else {
-            setDOMAttribute(domElement, key, props[key], isSvg.isSVG)
+            setDOMAttribute(domElement, key, props[key], isSvg)
         }
     }
 }
@@ -159,15 +139,14 @@ function patchAttributes(domElement, newProps, oldProps, isSvg) {
     }
 }
 
-function setDOMAttribute(el, attr, value, isSVG) {
+function setDOMAttribute(el, attr, value, isSvg) {
     if (value === true) {
         el.setAttribute(attr, "")
     } else if (value === false) {
         el.removeAttribute(attr)
     } else {
-        var namespace = isSVG ? NS_ATTRS[attr] : undefined
-        if (namespace !== undefined) {
-            el.setAttributeNS(namespace, attr, value)
+        if (isSvg) {
+            el[attr, value]
         } else {
             el.setAttribute(attr, value)
         }
@@ -191,7 +170,7 @@ function mount(vnode, isSvg) {
         if (!isSvg) {
             node = document.createElement(type)
         } else {
-            node = document.createElementNS(SVG_NS, type)
+            node = document.createElementNS("http://www.w3.org/2000/svg", type)
         }
         mountAttributes(node, props, isSvg)
         let childrenRef =
@@ -210,13 +189,10 @@ function mount(vnode, isSvg) {
         }
     } else if (isRenderFunction(vnode)) {
         currentVnode = vnode
-
         let childVnode = vnode.type(vnode.props)
-
         cursor = 0
 
         let childRef = mount(childVnode, isSvg)
-
 
         return {
             type: REF_PARENT,
@@ -229,11 +205,6 @@ function mount(vnode, isSvg) {
             node: vnode,
         }
     }
-    if (vnode === undefined) {
-        throw new Error("mount: vnode is undefined!")
-    }
-
-    throw new Error("mount: Invalid Vnode!")
 }
 
 function patch(
@@ -455,7 +426,7 @@ function defaultShouldUpdate(p1, p2) {
 function render(vnode, parentDomNode) {
     let rootRef = parentDomNode.$$PETIT_DOM_REF
     if (rootRef == null) {
-        
+
         const ref = mount(vnode, false)
         parentDomNode.$$PETIT_DOM_REF = { ref, vnode }
         parentDomNode.textContent = ""
