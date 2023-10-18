@@ -1,11 +1,8 @@
-const EMPTY_OBJECT = {}
-
 const VTYPE_ELEMENT = 1
 const VTYPE_FUNCTION = 2
 const REF_SINGLE = 1
 const REF_ARRAY = 4
 const REF_PARENT = 8
-
 
 let cursor = 0
 let currentVnode = null
@@ -19,21 +16,16 @@ const isElement = (c) => c?.vtype === VTYPE_ELEMENT
 const isComponent = (c) => c?.vtype === VTYPE_FUNCTION
 
 function h(type, props, ...children) {
-    props = props ?? EMPTY_OBJECT
+    props = props || {}
 
-    props =
-        children.length > 1
-            ? Object.assign({}, props, { children })
-            : children.length === 1
-                ? Object.assign({}, props, { children: children[0] })
-                : props
+    if (children.length) {
+        props.children = kids.length === 1 ? kids[0] : kids
+    }
 
     const vtype =
         typeof type === "string"
             ? VTYPE_ELEMENT
-            : typeof type === "function"
-                ? VTYPE_FUNCTION
-                : 0
+            : VTYPE_FUNCTION
 
     return {
         vtype,
@@ -94,22 +86,6 @@ function removeDom(parent, ref) {
         ref.children.forEach((ch) => removeDom(parent, ch))
     } else if (ref.type === REF_PARENT) {
         removeDom(parent, ref.childRef)
-    }
-}
-
-function replaceDom(parent, newRef, oldRef) {
-    insertDom(parent, newRef, getDomNode(oldRef))
-    removeDom(parent, oldRef)
-}
-
-function mountAttributes(dom, props, isSvg) {
-    for (var key in props) {
-        if (key === "key" || key === "children") continue
-        if (key[0] === 'o' && key[1] === 'n') {
-            dom[key.toLowerCase()] = props[key]
-        } else {
-            setDOMAttribute(dom, key, props[key], isSvg)
-        }
     }
 }
 
@@ -174,9 +150,18 @@ function mount(vnode, isSvg) {
         } else {
             node = document.createElementNS("http://www.w3.org/2000/svg", type)
         }
-        mountAttributes(node, props, isSvg)
+
+        for (var key in props) {
+            if (key === "key" || key === "children") continue
+            if (key[0] === 'o' && key[1] === 'n') {
+                dom[key.toLowerCase()] = props[key]
+            } else {
+                setDOMAttribute(dom, key, props[key], isSvg)
+            }
+        }
+
         let childrenRef = props.children == null ? null : mount(props.children, isSvg)
-        if (childrenRef != null) insertDom(node, childrenRef)
+        childrenRef && insertDom(node, childrenRef)
         return {
             type: REF_SINGLE,
             node,
@@ -189,8 +174,6 @@ function mount(vnode, isSvg) {
         }
     } else if (isComponent(vnode)) {
         currentVnode = vnode
-
-
         let childVnode = vnode.type(vnode.props)
         cursor = 0
 
@@ -232,22 +215,22 @@ function reconcile(
             isSvg = true
         }
         reconcileAttributes(ref.node, newVnode.props, oldVnode.props, isSvg)
-        let oldChildren = oldVnode.props.children
-        let newChildren = newVnode.props.children
-        if (oldChildren == null) {
-            if (newChildren != null) {
-                ref.children = mount(newChildren, isSvg)
+        let oldCh = oldVnode.props.children
+        let newCh = newVnode.props.children
+        if (oldCh == null) {
+            if (newCh != null) {
+                ref.children = mount(newCh, isSvg)
                 insertDom(ref.node, ref.children)
             }
         } else {
-            if (newChildren == null) {
+            if (newCh == null) {
                 ref.node.textContent = ""
                 ref.children = null
             } else {
                 ref.children = reconcile(
                     ref.node,
-                    newChildren,
-                    oldChildren,
+                    newCh,
+                    oldCh,
                     ref.children,
                     isSvg
                 )
@@ -299,14 +282,14 @@ function reconcile(
     }
 }
 
-function reconcileChildren(parent, newChildren, oldchildren, ref, isSvg) {
+function reconcileChildren(parent, newCh, oldch, ref, isSvg) {
     const nextNode = getNextSibling(ref)
-    const children = Array(newChildren.length)
+    const children = Array(newCh.length)
     let refChildren = ref.children
     let newStart = 0,
         oldStart = 0,
-        newEnd = newChildren.length - 1,
-        oldEnd = oldchildren.length - 1
+        newEnd = newCh.length - 1,
+        oldEnd = oldch.length - 1
     let oldVnode, newVnode, oldRef, newRef, refMap
 
     while (newStart <= newEnd && oldStart <= oldEnd) {
@@ -319,8 +302,8 @@ function reconcileChildren(parent, newChildren, oldchildren, ref, isSvg) {
             continue
         }
 
-        oldVnode = oldchildren[oldStart]
-        newVnode = newChildren[newStart]
+        oldVnode = oldch[oldStart]
+        newVnode = newCh[newStart]
         if (newVnode?.key === oldVnode?.key) {
             oldRef = refChildren[oldStart]
             newRef = children[newStart] = reconcile(
@@ -335,8 +318,8 @@ function reconcileChildren(parent, newChildren, oldchildren, ref, isSvg) {
             continue
         }
 
-        oldVnode = oldchildren[oldEnd]
-        newVnode = newChildren[newEnd]
+        oldVnode = oldch[oldEnd]
+        newVnode = newCh[newEnd]
         if (newVnode?.key === oldVnode?.key) {
             oldRef = refChildren[oldEnd]
             newRef = children[newEnd] = reconcile(
@@ -354,17 +337,16 @@ function reconcileChildren(parent, newChildren, oldchildren, ref, isSvg) {
         if (refMap == null) {
             refMap = {}
             for (let i = oldStart; i <= oldEnd; i++) {
-                oldVnode = oldchildren[i]
+                oldVnode = oldch[i]
                 if (oldVnode?.key != null) {
                     refMap[oldVnode.key] = i
                 }
             }
         }
-
-        newVnode = newChildren[newStart]
+        newVnode = newCh[newStart]
         const idx = newVnode?.key != null ? refMap[newVnode.key] : null
         if (idx != null) {
-            oldVnode = oldchildren[idx]
+            oldVnode = oldch[idx]
             oldRef = refChildren[idx]
             newRef = children[newStart] = reconcile(
                 parent,
@@ -386,11 +368,11 @@ function reconcileChildren(parent, newChildren, oldchildren, ref, isSvg) {
     }
 
     const beforeNode =
-        newEnd < newChildren.length - 1
+        newEnd < newCh.length - 1
             ? getDomNode(children[newEnd + 1])
             : nextNode
     while (newStart <= newEnd) {
-        const newRef = mount(newChildren[newStart], isSvg)
+        const newRef = mount(newCh[newStart], isSvg)
         children[newStart] = newRef
         insertDom(parent, newRef, beforeNode)
         newStart++
@@ -405,12 +387,9 @@ function reconcileChildren(parent, newChildren, oldchildren, ref, isSvg) {
     ref.children = children
 }
 
-function defaultShouldUpdate(p1, p2) {
-    if (p1 === p2) return false
-    for (let key in p2) {
-        if (p1[key] !== p2[key]) return true
-    }
-    return false
+function defaultShouldUpdate(a, b) {
+    for (let i in a) if (!(i in b)) return true
+    for (let i in b) if (a[i] !== b[i]) return true
 }
 
 function render(vnode, parent) {
