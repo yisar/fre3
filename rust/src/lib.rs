@@ -15,6 +15,7 @@ pub mod parse;
 pub mod token;
 pub mod util;
 pub mod visit;
+pub mod cst;
 
 pub fn parse(source: &[u8]) -> SyntaxResult<Node> {
   let lexer = Lexer::new(source);

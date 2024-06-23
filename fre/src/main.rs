@@ -1,5 +1,6 @@
 
 use parse_js::parse;
+use parse_js::cst::*;
 
 fn main() {
   let src = r#"
@@ -20,6 +21,8 @@ fn main() {
   // println!("{:#?}", func);
 
   let tree = parse(src.as_bytes()).unwrap();
+
+  let pure = 
   
   println!("{:#?}", tree);
 }
