@@ -43,11 +43,12 @@ mod tests {
   }
 }
 
+#[derive(Clone)]
 pub struct Node {
   // A location is not a SourceRange; consider that after some transformations, it's possible to create entirely new nodes that don't exist at all in the source code. Also, sometimes we cannot be bothered to set a location, or can only provide an approximate/best-effort location.
   pub loc: Loc,
   pub stx: Box<Syntax>,
-  pub assoc: NodeAssocData,
+  // pub assoc: NodeAssocData,
 }
 
 impl Node {
@@ -55,7 +56,7 @@ impl Node {
     Node {
       loc,
       stx: Box::new(stx),
-      assoc: NodeAssocData::default(),
+      // assoc: NodeAssocData::default(),
     }
   }
 
@@ -97,7 +98,7 @@ pub enum VarDeclMode {
   Var,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Clone, Serialize)]
 pub enum ArrayElement {
   Single(Expression),
   Rest(Expression),
@@ -105,7 +106,7 @@ pub enum ArrayElement {
 }
 
 // WARNING: This enum must exist, and the two variants cannot be merged by representing Direct with an IdentifierExpr, as it's not a usage of a variable!
-#[derive(Debug, Serialize)]
+#[derive(Debug, Clone, Serialize)]
 pub enum ClassOrObjectMemberKey {
   // Identifier, keyword, string, or number.
   // NOTE: This isn't used by ObjectMemberType::Shorthand.
@@ -113,7 +114,7 @@ pub enum ClassOrObjectMemberKey {
   Computed(Expression),
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Clone, Serialize)]
 pub enum ClassOrObjectMemberValue {
   Getter {
     function: Node, // Always Function. `params` is empty.
@@ -130,7 +131,7 @@ pub enum ClassOrObjectMemberValue {
   },
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Clone, Serialize)]
 pub enum ObjectMemberType {
   Valued {
     key: ClassOrObjectMemberKey,
@@ -144,13 +145,13 @@ pub enum ObjectMemberType {
   },
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Clone, Serialize)]
 pub struct ArrayPatternElement {
   pub target: Pattern,
   pub default_value: Option<Expression>,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Clone, Serialize)]
 pub struct ExportName {
   // For simplicity, we always set both fields; for shorthands, both nodes are identical.
   pub target: String,
@@ -158,7 +159,7 @@ pub struct ExportName {
   pub alias: Pattern,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Clone, Serialize)]
 pub enum ExportNames {
   // `import * as name`
   // `export * from "module"`
@@ -172,26 +173,26 @@ pub enum ExportNames {
   Specific(Vec<ExportName>),
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Clone, Serialize)]
 pub struct VariableDeclarator {
   pub pattern: Pattern,
   pub initializer: Option<Expression>,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Clone, Serialize)]
 pub enum ForInit {
   None,
   Expression(Expression),
   Declaration(Declaration),
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Clone, Serialize)]
 pub enum LiteralTemplatePart {
   Substitution(Expression),
   String(String),
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Clone)]
 #[serde(tag = "$t")]
 pub enum Syntax {
   // Patterns.

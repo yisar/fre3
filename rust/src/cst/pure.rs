@@ -1,6 +1,6 @@
 use std::{fmt, mem, sync::Arc};
 
-use crate::cst::delta::Delta;
+use crate::{cst::delta::Delta, ast::Node};
 
 #[derive(Clone)]
 pub struct PureTree {
@@ -11,6 +11,7 @@ pub struct PureTree {
 pub struct PureTreeData {
     kind: &'static str,
     text_len: usize,
+    node: Node,
     children: Vec<PureChild>,
 }
 
@@ -64,8 +65,8 @@ impl PureToken {
 }
 
 impl PureTree {
-    pub fn new(kind: &'static str) -> PureTreeData {
-        PureTreeData { kind: kind.into(), text_len: 0, children: Vec::new() }
+    pub fn new(kind: &'static str, node:Node) -> PureTreeData {
+        PureTreeData { kind: kind.into(), text_len: 0, children: Vec::new() ,node:node}
     }
     pub fn kind(&self) -> &'static str {
         self.data.kind
