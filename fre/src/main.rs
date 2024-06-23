@@ -15,7 +15,7 @@ fn main() {
   render(<App/>, document.body)
     "#;
 
-  let mut node = parse_js(src.as_bytes());
+  let mut node = parse(src.as_bytes());
 
   println!("{:#?}",node);
 }

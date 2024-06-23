@@ -474,7 +474,7 @@ impl<'a> Parser<'a> {
     };
     self.require(TokenType::KeywordFrom)?;
     let module = self.parse_and_normalise_literal_string(ctx)?;
-    self.require(TokenType::Semicolon)?;
+    // self.require(TokenType::Semicolon)?;
     // TODO Loc
     Ok(Node::new(start.loc, Syntax::ImportStmt {
       default,
