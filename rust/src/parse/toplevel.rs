@@ -3,12 +3,13 @@ use super::ParseCtx;
 use super::Parser;
 use crate::ast::Node;
 use crate::ast::Syntax;
+use crate::cst::PureTree;
 use crate::cst::SyntaxTree;
 use crate::error::SyntaxResult;
 use crate::token::TokenType;
 
 impl<'a> Parser<'a> {
-  pub fn parse_top_level(&mut self) -> SyntaxResult<Node> {
+  pub fn parse_top_level(&mut self) -> SyntaxResult<SyntaxTree> {
     let ctx = ParseCtx {
       rules: ParsePatternRules {
         await_allowed: true,
@@ -18,7 +19,8 @@ impl<'a> Parser<'a> {
     let body = self.parse_stmts(ctx, TokenType::EOF)?;
     self.require(TokenType::EOF)?;
     let top_level_node = Node::new(self.source_range(), Syntax::TopLevel { body });
+    let top_level_pure: PureTree = PureTree::new("toplevel", top_level_node).into();
 
-    Ok(top_level_node)
+    Ok(top_level_pure.into())
   }
 }
