@@ -1,6 +1,7 @@
-
-use parse_js::parse;
+use parse_js::ast::{Node, Syntax};
 use parse_js::cst::*;
+use parse_js::loc::Loc;
+use parse_js::parse;
 
 fn main() {
   let src = r#"
@@ -22,7 +23,22 @@ fn main() {
 
   let tree = parse(src.as_bytes()).unwrap();
 
-  let pure = 
+  let pure: PureTree = PureTree::new("toplevel", tree).into();
+
+  let pure2 = PureTree::new(
+    "aaa",
+    Node::new(
+      Loc(0, 0),
+      Syntax::IdentifierExpr {
+        name: "bbb".to_string(),
+      },
+    ),
+  );
+  let syntax: SyntaxTree = pure.into();
+
   
-  println!("{:#?}", tree);
+
+  syntax.replace_pure(pure2.into());
+
+  println!("{:#?}", syntax);
 }
