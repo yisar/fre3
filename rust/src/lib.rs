@@ -3,6 +3,7 @@ use error::SyntaxResult;
 use lex::Lexer;
 use parse::Parser;
 
+pub mod cst;
 pub mod ast;
 pub mod char;
 pub mod error;

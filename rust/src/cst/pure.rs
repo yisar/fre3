@@ -1,6 +1,6 @@
 use std::{fmt, mem, sync::Arc};
 
-use crate::delta::Delta;
+use crate::cst::delta::Delta;
 
 #[derive(Clone)]
 pub struct PureTree {
