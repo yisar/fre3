@@ -1,0 +1,24 @@
+{
+  "$t": "VarDecl",
+  "declarators": [
+    {
+      "initializer": {
+        "$t": "LiteralNumberExpr",
+        "value": 1.0
+      },
+      "pattern": {
+        "$t": "IdentifierPattern",
+        "name": "a"
+      }
+    },
+    {
+      "initializer": null,
+      "pattern": {
+        "$t": "IdentifierPattern",
+        "name": "b"
+      }
+    }
+  ],
+  "export": false,
+  "mode": "Let"
+}

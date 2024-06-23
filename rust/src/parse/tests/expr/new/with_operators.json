@@ -1,0 +1,26 @@
+{
+  "$t": "UnaryExpr",
+  "argument": {
+    "$t": "UnaryExpr",
+    "argument": {
+      "$t": "CallExpr",
+      "arguments": [],
+      "callee": {
+        "$t": "MemberExpr",
+        "left": {
+          "$t": "IdentifierExpr",
+          "name": "abc"
+        },
+        "optional_chaining": true,
+        "parenthesised": false,
+        "right": "def"
+      },
+      "optional_chaining": false,
+      "parenthesised": false
+    },
+    "operator": "New",
+    "parenthesised": false
+  },
+  "operator": "UnaryPlus",
+  "parenthesised": false
+}

@@ -1,0 +1,49 @@
+{
+  "$t": "BinaryExpr",
+  "left": {
+    "$t": "BinaryExpr",
+    "left": {
+      "$t": "BinaryExpr",
+      "left": {
+        "$t": "BinaryExpr",
+        "left": {
+          "$t": "IdentifierExpr",
+          "name": "a"
+        },
+        "operator": "Comma",
+        "parenthesised": false,
+        "right": {
+          "$t": "IdentifierExpr",
+          "name": "b"
+        }
+      },
+      "operator": "Comma",
+      "parenthesised": false,
+      "right": {
+        "$t": "BinaryExpr",
+        "left": {
+          "$t": "IdentifierExpr",
+          "name": "c"
+        },
+        "operator": "LogicalAnd",
+        "parenthesised": false,
+        "right": {
+          "$t": "IdentifierExpr",
+          "name": "d"
+        }
+      }
+    },
+    "operator": "Comma",
+    "parenthesised": false,
+    "right": {
+      "$t": "IdentifierExpr",
+      "name": "e"
+    }
+  },
+  "operator": "Comma",
+  "parenthesised": false,
+  "right": {
+    "$t": "IdentifierExpr",
+    "name": "f"
+  }
+}

@@ -1,0 +1,22 @@
+[package]
+authors = ["Wilson Lin <code@wilsonl.in>"]
+categories = ["development-tools::build-utils", "web-programming"]
+description = "JavaScript parsing library"
+edition = "2021"
+homepage = "https://github.com/wilsonzlin/parse-js"
+keywords = ["javascript", "parse", "parser", "js", "ecmascript"]
+license = "Apache-2.0"
+name = "parse-js"
+repository = "https://github.com/wilsonzlin/parse-js"
+version = "0.24.0"
+
+[dependencies]
+ahash = "0.8.7"
+aho-corasick = "0.7"
+memchr = "2"
+once_cell = "1.19.0"
+serde = { version = "1", features = ["derive"] }
+serde_json = { version = "1" }
+
+[dev-dependencies]
+similar = "2.1.0"

@@ -1,0 +1,126 @@
+{
+  "$t": "BinaryExpr",
+  "left": {
+    "$t": "ArrowFunctionExpr",
+    "function": {
+      "$t": "Function",
+      "arrow": true,
+      "async_": false,
+      "body": {
+        "$t": "FunctionBody",
+        "body": []
+      },
+      "generator": false,
+      "parameters": [
+        {
+          "$t": "ParamDecl",
+          "default_value": null,
+          "pattern": {
+            "$t": "ObjectPattern",
+            "properties": [],
+            "rest": null
+          },
+          "rest": false
+        }
+      ]
+    },
+    "parenthesised": false
+  },
+  "operator": "Comma",
+  "parenthesised": false,
+  "right": {
+    "$t": "ArrowFunctionExpr",
+    "function": {
+      "$t": "Function",
+      "arrow": true,
+      "async_": false,
+      "body": {
+        "$t": "BinaryExpr",
+        "left": {
+          "$t": "LiteralNumberExpr",
+          "value": 1.0
+        },
+        "operator": "Comma",
+        "parenthesised": false,
+        "right": {
+          "$t": "ArrowFunctionExpr",
+          "function": {
+            "$t": "Function",
+            "arrow": true,
+            "async_": false,
+            "body": {
+              "$t": "LiteralArrayExpr",
+              "elements": []
+            },
+            "generator": false,
+            "parameters": [
+              {
+                "$t": "ParamDecl",
+                "default_value": null,
+                "pattern": {
+                  "$t": "ObjectPattern",
+                  "properties": [
+                    {
+                      "$t": "ObjectPatternProperty",
+                      "default_value": null,
+                      "key": {
+                        "Direct": "a"
+                      },
+                      "shorthand": true,
+                      "target": {
+                        "$t": "IdentifierPattern",
+                        "name": "a"
+                      }
+                    },
+                    {
+                      "$t": "ObjectPatternProperty",
+                      "default_value": null,
+                      "key": {
+                        "Direct": "b"
+                      },
+                      "shorthand": true,
+                      "target": {
+                        "$t": "IdentifierPattern",
+                        "name": "b"
+                      }
+                    }
+                  ],
+                  "rest": null
+                },
+                "rest": false
+              }
+            ]
+          },
+          "parenthesised": false
+        }
+      },
+      "generator": false,
+      "parameters": [
+        {
+          "$t": "ParamDecl",
+          "default_value": null,
+          "pattern": {
+            "$t": "ObjectPattern",
+            "properties": [
+              {
+                "$t": "ObjectPatternProperty",
+                "default_value": null,
+                "key": {
+                  "Direct": "a"
+                },
+                "shorthand": true,
+                "target": {
+                  "$t": "IdentifierPattern",
+                  "name": "a"
+                }
+              }
+            ],
+            "rest": null
+          },
+          "rest": false
+        }
+      ]
+    },
+    "parenthesised": false
+  }
+}

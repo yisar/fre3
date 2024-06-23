@@ -1,0 +1,74 @@
+{
+  "$t": "BinaryExpr",
+  "left": {
+    "$t": "BinaryExpr",
+    "left": {
+      "$t": "CallExpr",
+      "arguments": [],
+      "callee": {
+        "$t": "FunctionExpr",
+        "function": {
+          "$t": "Function",
+          "arrow": false,
+          "async_": false,
+          "body": {
+            "$t": "FunctionBody",
+            "body": []
+          },
+          "generator": false,
+          "parameters": []
+        },
+        "name": null,
+        "parenthesised": true
+      },
+      "optional_chaining": false,
+      "parenthesised": false
+    },
+    "operator": "Comma",
+    "parenthesised": false,
+    "right": {
+      "$t": "CallExpr",
+      "arguments": [],
+      "callee": {
+        "$t": "ArrowFunctionExpr",
+        "function": {
+          "$t": "Function",
+          "arrow": true,
+          "async_": false,
+          "body": {
+            "$t": "FunctionBody",
+            "body": []
+          },
+          "generator": false,
+          "parameters": []
+        },
+        "parenthesised": true
+      },
+      "optional_chaining": false,
+      "parenthesised": false
+    }
+  },
+  "operator": "Comma",
+  "parenthesised": false,
+  "right": {
+    "$t": "CallExpr",
+    "arguments": [],
+    "callee": {
+      "$t": "ArrowFunctionExpr",
+      "function": {
+        "$t": "Function",
+        "arrow": true,
+        "async_": true,
+        "body": {
+          "$t": "FunctionBody",
+          "body": []
+        },
+        "generator": false,
+        "parameters": []
+      },
+      "parenthesised": true
+    },
+    "optional_chaining": false,
+    "parenthesised": false
+  }
+}

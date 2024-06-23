@@ -1,0 +1,35 @@
+{
+  "$t": "CallExpr",
+  "arguments": [
+    {
+      "$t": "CallArg",
+      "spread": false,
+      "value": {
+        "$t": "LiteralNumberExpr",
+        "value": 1.0
+      }
+    },
+    {
+      "$t": "CallArg",
+      "spread": false,
+      "value": {
+        "$t": "LiteralNumberExpr",
+        "value": 2.0
+      }
+    },
+    {
+      "$t": "CallArg",
+      "spread": false,
+      "value": {
+        "$t": "LiteralNumberExpr",
+        "value": 3.0
+      }
+    }
+  ],
+  "callee": {
+    "$t": "IdentifierExpr",
+    "name": "ab"
+  },
+  "optional_chaining": false,
+  "parenthesised": false
+}

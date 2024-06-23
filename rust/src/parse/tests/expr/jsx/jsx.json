@@ -1,0 +1,171 @@
+{
+  "$t": "JsxElement",
+  "attributes": [
+    {
+      "$t": "JsxAttribute",
+      "name": {
+        "$t": "JsxName",
+        "name": "x",
+        "namespace": null
+      },
+      "value": {
+        "$t": "JsxExpressionContainer",
+        "value": {
+          "$t": "LiteralNumberExpr",
+          "value": 1.0
+        }
+      }
+    },
+    {
+      "$t": "JsxAttribute",
+      "name": {
+        "$t": "JsxName",
+        "name": "y",
+        "namespace": null
+      },
+      "value": {
+        "$t": "JsxText",
+        "value": "'a'"
+      }
+    }
+  ],
+  "children": [
+    {
+      "$t": "JsxText",
+      "value": "  a\n  "
+    },
+    {
+      "$t": "JsxElement",
+      "attributes": [
+        {
+          "$t": "JsxAttribute",
+          "name": {
+            "$t": "JsxName",
+            "name": "z",
+            "namespace": "xLa"
+          },
+          "value": {
+            "$t": "JsxText",
+            "value": "\"a\""
+          }
+        }
+      ],
+      "children": [
+        {
+          "$t": "JsxExpressionContainer",
+          "value": {
+            "$t": "LiteralNumberExpr",
+            "value": 1.0
+          }
+        },
+        {
+          "$t": "JsxExpressionContainer",
+          "value": {
+            "$t": "LiteralNumberExpr",
+            "value": 2.0
+          }
+        },
+        {
+          "$t": "JsxText",
+          "value": " "
+        },
+        {
+          "$t": "JsxExpressionContainer",
+          "value": {
+            "$t": "JsxElement",
+            "attributes": [
+              {
+                "$t": "JsxSpreadAttribute",
+                "value": {
+                  "$t": "LiteralObjectExpr",
+                  "members": [
+                    {
+                      "$t": "ObjectMember",
+                      "typ": {
+                        "Valued": {
+                          "key": {
+                            "Direct": "a"
+                          },
+                          "value": {
+                            "Property": {
+                              "initializer": {
+                                "$t": "IdentifierExpr",
+                                "name": "b"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    {
+                      "$t": "ObjectMember",
+                      "typ": {
+                        "Shorthand": {
+                          "identifier": {
+                            "$t": "IdentifierExpr",
+                            "name": "c"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            ],
+            "children": [],
+            "name": {
+              "$t": "JsxName",
+              "name": "a",
+              "namespace": "nu"
+            }
+          }
+        }
+      ],
+      "name": {
+        "$t": "JsxName",
+        "name": "a4-3",
+        "namespace": "bc1--"
+      }
+    },
+    {
+      "$t": "JsxText",
+      "value": "\n  a "
+    },
+    {
+      "$t": "JsxElement",
+      "attributes": [],
+      "children": [],
+      "name": {
+        "$t": "JsxMemberExpression",
+        "base": {
+          "$t": "IdentifierExpr",
+          "name": "red"
+        },
+        "path": [
+          "a"
+        ]
+      }
+    },
+    {
+      "$t": "JsxText",
+      "value": " bb\n    bb  "
+    },
+    {
+      "$t": "JsxElement",
+      "attributes": [],
+      "children": [],
+      "name": null
+    }
+  ],
+  "name": {
+    "$t": "JsxMemberExpression",
+    "base": {
+      "$t": "IdentifierExpr",
+      "name": "a"
+    },
+    "path": [
+      "b",
+      "c"
+    ]
+  }
+}

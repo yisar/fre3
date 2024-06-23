@@ -1,0 +1,43 @@
+{
+  "$t": "ArrowFunctionExpr",
+  "function": {
+    "$t": "Function",
+    "arrow": true,
+    "async_": false,
+    "body": {
+      "$t": "FunctionBody",
+      "body": []
+    },
+    "generator": false,
+    "parameters": [
+      {
+        "$t": "ParamDecl",
+        "default_value": null,
+        "pattern": {
+          "$t": "IdentifierPattern",
+          "name": "a"
+        },
+        "rest": false
+      },
+      {
+        "$t": "ParamDecl",
+        "default_value": null,
+        "pattern": {
+          "$t": "IdentifierPattern",
+          "name": "b"
+        },
+        "rest": false
+      },
+      {
+        "$t": "ParamDecl",
+        "default_value": null,
+        "pattern": {
+          "$t": "IdentifierPattern",
+          "name": "c"
+        },
+        "rest": false
+      }
+    ]
+  },
+  "parenthesised": false
+}

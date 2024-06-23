@@ -1,0 +1,13 @@
+{
+  "$t": "BinaryExpr",
+  "left": {
+    "$t": "LiteralRegexExpr",
+    "value": "/a/g0"
+  },
+  "operator": "Division",
+  "parenthesised": false,
+  "right": {
+    "$t": "LiteralRegexExpr",
+    "value": "/a/"
+  }
+}

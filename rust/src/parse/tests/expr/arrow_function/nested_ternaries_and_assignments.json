@@ -1,0 +1,58 @@
+{
+  "$t": "BinaryExpr",
+  "left": {
+    "$t": "IdentifierPattern",
+    "name": "x"
+  },
+  "operator": "Assignment",
+  "parenthesised": false,
+  "right": {
+    "$t": "ConditionalExpr",
+    "alternate": {
+      "$t": "LiteralNumberExpr",
+      "value": 5.0
+    },
+    "consequent": {
+      "$t": "ArrowFunctionExpr",
+      "function": {
+        "$t": "Function",
+        "arrow": true,
+        "async_": false,
+        "body": {
+          "$t": "ConditionalExpr",
+          "alternate": {
+            "$t": "IdentifierExpr",
+            "name": "x"
+          },
+          "consequent": {
+            "$t": "IdentifierExpr",
+            "name": "x"
+          },
+          "parenthesised": false,
+          "test": {
+            "$t": "IdentifierExpr",
+            "name": "x"
+          }
+        },
+        "generator": false,
+        "parameters": [
+          {
+            "$t": "ParamDecl",
+            "default_value": null,
+            "pattern": {
+              "$t": "IdentifierPattern",
+              "name": "x"
+            },
+            "rest": false
+          }
+        ]
+      },
+      "parenthesised": false
+    },
+    "parenthesised": false,
+    "test": {
+      "$t": "LiteralBooleanExpr",
+      "value": true
+    }
+  }
+}

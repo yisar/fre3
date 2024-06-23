@@ -1,0 +1,36 @@
+{
+  "$t": "UnaryExpr",
+  "argument": {
+    "$t": "UnaryExpr",
+    "argument": {
+      "$t": "UnaryExpr",
+      "argument": {
+        "$t": "UnaryExpr",
+        "argument": {
+          "$t": "MemberExpr",
+          "left": {
+            "$t": "MemberExpr",
+            "left": {
+              "$t": "IdentifierExpr",
+              "name": "abc"
+            },
+            "optional_chaining": true,
+            "parenthesised": false,
+            "right": "def"
+          },
+          "optional_chaining": false,
+          "parenthesised": false,
+          "right": "ghi"
+        },
+        "operator": "BitwiseNot",
+        "parenthesised": false
+      },
+      "operator": "PrefixIncrement",
+      "parenthesised": false
+    },
+    "operator": "LogicalNot",
+    "parenthesised": false
+  },
+  "operator": "LogicalNot",
+  "parenthesised": false
+}
