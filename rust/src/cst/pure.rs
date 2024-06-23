@@ -162,14 +162,3 @@ impl From<PureTree> for PureChildKind {
     PureChildKind::Tree(token)
   }
 }
-
-fn fmt_rec(f: &mut fmt::Formatter<'_>, lvl: usize, tree: &PureTree) -> fmt::Result {
-  writeln!(f, "{:indent$}{}", "", tree.kind(), indent = lvl * 2)?;
-  for child in tree.children() {
-    match &child.kind {
-      PureChildKind::Tree(it) => fmt_rec(f, lvl + 1, &it)?,
-      PureChildKind::Token(it) => writeln!(f, "{:indent$}{:?}", "", it, indent = lvl * 2 + 2)?,
-    }
-  }
-  Ok(())
-}

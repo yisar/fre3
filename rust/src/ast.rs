@@ -3,45 +3,12 @@ use crate::error::SyntaxErrorType;
 use crate::loc::Loc;
 use crate::num::JsNumber;
 use crate::operator::OperatorName;
-use ahash::AHashMap;
 use core::fmt::Debug;
 use serde::Serialize;
 use serde::Serializer;
-use std::any::Any;
-use std::any::TypeId;
 use std::fmt;
 use std::fmt::Formatter;
 
-#[derive(Default)]
-pub struct NodeAssocData {
-  map: AHashMap<TypeId, Box<dyn Any>>,
-}
-
-impl NodeAssocData {
-  pub fn get<T: Any>(&self) -> Option<&T> {
-    let t = TypeId::of::<T>();
-    self.map.get(&t).map(|v| v.downcast_ref().unwrap())
-  }
-
-  pub fn set<T: Any>(&mut self, v: T) {
-    let t = TypeId::of::<T>();
-    self.map.insert(t, Box::from(v));
-  }
-}
-
-#[cfg(test)]
-mod tests {
-  use crate::ast::NodeAssocData;
-
-  #[test]
-  fn test_node_assoc_data() {
-    struct MyType(u32);
-    let mut assoc = NodeAssocData::default();
-    assoc.set(MyType(32));
-    let v = assoc.get::<MyType>().unwrap();
-    assert_eq!(v.0, 32);
-  }
-}
 
 #[derive(Clone)]
 pub struct Node {
