@@ -36,5 +36,5 @@ fn main() {
 
   pure.replace_pure(node2);
 
-  println!("{:#?}", pure);
+  println!("{:#?}", <PureTree as Into<Node>>::into(pure));
 }
