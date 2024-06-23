@@ -19,9 +19,6 @@ fn main() {
   render(<App/>, document.body)
     "#;
 
-  // let func = make_tree();
-  // println!("{:#?}", func);
-
   let tree = parse(src.as_bytes()).unwrap();
 
   let pure: PureTree = PureTree::new(tree);
