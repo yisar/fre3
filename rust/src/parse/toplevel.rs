@@ -17,6 +17,7 @@ impl<'a> Parser<'a> {
     let body = self.parse_stmts(ctx, TokenType::EOF)?;
     self.require(TokenType::EOF)?;
     let top_level_node = Node::new(self.source_range(), Syntax::TopLevel { body });
+
     Ok(top_level_node)
   }
 }

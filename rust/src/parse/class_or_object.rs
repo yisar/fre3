@@ -42,7 +42,7 @@ impl<'a> Parser<'a> {
         TokenType::Semicolon,
         &mut Asi::can(),
       )?;
-      self.consume_if(TokenType::Semicolon)?;
+      let _ = self.consume_if(TokenType::Semicolon)?;
       members.push(Node::new(
         key_loc.add_option(static_) + value_loc,
         Syntax::ClassMember {

@@ -137,7 +137,7 @@ pub fn normalise_literal_string(raw: &str) -> Option<String> {
 }
 
 impl<'a> Parser<'a> {
-  pub fn parse_and_normalise_literal_string(&mut self, ctx: ParseCtx) -> SyntaxResult<String> {
+  pub fn parse_and_normalise_literal_string(&mut self, _ctx: ParseCtx) -> SyntaxResult<String> {
     let t = self.require(TokenType::LiteralString)?;
     normalise_literal_string(self.str(t.loc))
       .ok_or_else(|| t.loc.error(SyntaxErrorType::InvalidCharacterEscape, None))
