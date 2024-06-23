@@ -1,4 +1,5 @@
 use ast::Node;
+use cst::SyntaxTree;
 use error::SyntaxResult;
 use lex::Lexer;
 use parse::Parser;

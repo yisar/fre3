@@ -3,6 +3,7 @@ use super::ParseCtx;
 use super::Parser;
 use crate::ast::Node;
 use crate::ast::Syntax;
+use crate::cst::SyntaxTree;
 use crate::error::SyntaxResult;
 use crate::token::TokenType;
 
@@ -17,6 +18,7 @@ impl<'a> Parser<'a> {
     let body = self.parse_stmts(ctx, TokenType::EOF)?;
     self.require(TokenType::EOF)?;
     let top_level_node = Node::new(self.source_range(), Syntax::TopLevel { body });
+
     Ok(top_level_node)
   }
 }
