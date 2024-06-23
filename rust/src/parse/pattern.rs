@@ -115,7 +115,7 @@ impl<'a> Parser<'a> {
             None
           };
           loc.extend(default_value.as_ref().unwrap_or(&target).loc);
-          let direct_key_name = match &key {
+          let _direct_key_name = match &key {
             ClassOrObjectMemberKey::Direct(name) => Some(name.clone()),
             _ => None,
           };

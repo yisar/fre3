@@ -245,7 +245,7 @@ impl<'a> Parser<'a> {
     }
   }
 
-  pub fn parse_jsx_name(&mut self, ctx: ParseCtx) -> SyntaxResult<Node> {
+  pub fn parse_jsx_name(&mut self, _ctx: ParseCtx) -> SyntaxResult<Node> {
     let start = self.require_with_mode(TokenType::Identifier, LexMode::JsxTag)?;
     Ok(if self.consume_if(TokenType::Colon)?.is_match() {
       let name = self.require_with_mode(TokenType::Identifier, LexMode::JsxTag)?;
@@ -261,7 +261,7 @@ impl<'a> Parser<'a> {
     })
   }
 
-  pub fn parse_jsx_tag_name(&mut self, ctx: ParseCtx) -> SyntaxResult<Option<Node>> {
+  pub fn parse_jsx_tag_name(&mut self, _ctx: ParseCtx) -> SyntaxResult<Option<Node>> {
     Ok(
       match self
         .maybe_with_mode(TokenType::Identifier, LexMode::JsxTag)?

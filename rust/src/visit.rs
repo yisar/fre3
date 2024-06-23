@@ -470,9 +470,9 @@ pub trait Visitor {
 }
 
 pub trait VisitorMut {
-  fn on_syntax_down(&mut self, node: &mut Node, ctl: &mut JourneyControls) {}
+  fn on_syntax_down(&mut self, _node: &mut Node, _ctl: &mut JourneyControls) {}
 
-  fn on_syntax_up(&mut self, node: &mut Node) {}
+  fn on_syntax_up(&mut self, _node: &mut Node) {}
 
   fn visit_class_or_object_key(&mut self, key: &mut ClassOrObjectMemberKey) {
     match key {

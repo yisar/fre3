@@ -579,7 +579,7 @@ impl<'a> Parser<'a> {
     self.require(TokenType::ParenthesisOpen)?;
     let condition = self.parse_expr(ctx, TokenType::ParenthesisClose)?;
     let end = self.require(TokenType::ParenthesisClose)?;
-    self.consume_if(TokenType::Semicolon)?;
+    let _ = self.consume_if(TokenType::Semicolon)?;
     Ok(Node::new(start.loc + end.loc, Syntax::DoWhileStmt {
       condition,
       body,
