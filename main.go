@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"strings"
 	"testing"
-	jsx "github.com/yisar/snel"
+	jsx "github.com/yisar/snel/jsx"
 	ast "github.com/yisar/snel/ast"
 )
 
