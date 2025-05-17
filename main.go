@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
-	"testing"
 	jsx "github.com/yisar/snel/jsx"
 	ast "github.com/yisar/snel/ast"
 )
@@ -87,12 +86,10 @@ func (p *Printer) String() string {
 	return p.s.String()
 }
 
-func main(t *testing.T) {
+func main() {
 	input := `export default () => <style scoped>{"body { background: blue }"}</style>`
-	script, err := jsx.Parse("input.jsx", input)
-	if err != nil {
-		t.Fatal(err)
-	}
+	script, _ := jsx.Parse("input.jsx", input)
+
 	printer := &Printer{}
 	script.Visit(printer)
 	actual := printer.String()
