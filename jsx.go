@@ -1,4 +1,4 @@
-package snel
+package jsx
 
 import (
 	"fmt"

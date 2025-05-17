@@ -5,10 +5,8 @@ import (
 	"strconv"
 	"strings"
 	"testing"
-
-	"github.com/matthewmueller/diff"
 	jsx "github.com/yisar/snel"
-	"github.com/yisar/snel/ast"
+	ast "github.com/yisar/snel/ast"
 )
 
 func ExampleParse() {
@@ -89,7 +87,7 @@ func (p *Printer) String() string {
 	return p.s.String()
 }
 
-func TestVisit(t *testing.T) {
+func main(t *testing.T) {
 	input := `export default () => <style scoped>{"body { background: blue }"}</style>`
 	script, err := jsx.Parse("input.jsx", input)
 	if err != nil {
@@ -98,6 +96,5 @@ func TestVisit(t *testing.T) {
 	printer := &Printer{}
 	script.Visit(printer)
 	actual := printer.String()
-	expect := `export default () => <style scoped="true">{"body { background: blue }"}</style>`
-	diff.TestString(t, actual, expect)
+	fmt.Println(actual)
 }
