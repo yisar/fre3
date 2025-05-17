@@ -1,0 +1,41 @@
+text:"import { Link } from 'elmo'\n\nexport default function Button(props) {\n  return (\n    "
+<
+identifier:"Link"
+space:" "
+identifier:"href"
+=
+{
+expr:"props.href"
+}
+>
+text:"\n      "
+<
+identifier:"button"
+>
+text:"\n        "
+{
+expr:"props.children"
+}
+text:"\n        "
+<
+identifier:"style"
+space:" "
+identifier:"jsx"
+>
+text:"\n          "
+{
+expr:"`\n            button {\n              outline: none;\n              height: 33px;\n              border: 1px solid #ccced1;\n              text-decoration: none;\n              background: white;\n              border-radius: 6px;\n              padding: 6px 11px 8px 11px;\n              display: inline-block;\n              user-select: none;\n              color: #3b434b;\n              font-size: 15px;\n              font-weight: 700;\n              cursor: pointer;\n            }\n\n            button:hover {\n              border-color: #aaa;\n            }\n\n            button:active {\n              border-color: #aaa;\n            }\n          `"
+}
+text:"\n        "
+</
+identifier:"style"
+>
+text:"\n      "
+</
+identifier:"button"
+>
+text:"\n    "
+</
+identifier:"Link"
+>
+text:"\n  )\n}\n"
