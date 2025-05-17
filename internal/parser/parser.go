@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/matthewmueller/jsx/ast"
-	"github.com/matthewmueller/jsx/internal/lexer"
-	"github.com/matthewmueller/jsx/internal/token"
+	"github.com/yisar/snel/ast"
+	"github.com/yisar/snel/internal/lexer"
+	"github.com/yisar/snel/internal/token"
 )
 
 func Parse(path, input string) (*ast.Script, error) {

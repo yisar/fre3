@@ -1,6 +1,6 @@
 # jsx
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/matthewmueller/jsx.svg)](https://pkg.go.dev/github.com/matthewmueller/jsx)
+[![Go Reference](https://pkg.go.dev/badge/github.com/yisar/snel.svg)](https://pkg.go.dev/github.com/yisar/snel)
 
 JSX parser for `.jsx` and `.tsx` files.
 
@@ -9,7 +9,7 @@ This package is primarily used to rewrite JSX in JS files (think [styled-jsx](ht
 ## Install
 
 ```sh
-go get github.com/matthewmueller/jsx
+go get github.com/yisar/snel
 ```
 
 ## Usage

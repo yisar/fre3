@@ -1,4 +1,4 @@
-package jsx_test
+package main
 
 import (
 	"fmt"

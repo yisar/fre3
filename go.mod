@@ -1,4 +1,4 @@
-module github.com/matthewmueller/jsx
+module github.com/yisar/snel
 
 go 1.22.0
 

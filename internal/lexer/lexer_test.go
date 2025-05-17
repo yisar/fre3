@@ -9,7 +9,7 @@ import (
 	"testing"
 
 	"github.com/matthewmueller/diff"
-	"github.com/matthewmueller/jsx/internal/lexer"
+	"github.com/yisar/snel/internal/lexer"
 )
 
 func equal(t *testing.T, input, expected string) {

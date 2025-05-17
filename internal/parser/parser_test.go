@@ -7,8 +7,8 @@ import (
 	"testing"
 
 	"github.com/matthewmueller/diff"
-	"github.com/matthewmueller/jsx/ast"
-	"github.com/matthewmueller/jsx/internal/parser"
+	"github.com/yisar/snel/ast"
+	"github.com/yisar/snel/internal/parser"
 )
 
 func equal(t *testing.T, input, expected string) {
