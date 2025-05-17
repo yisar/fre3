@@ -2,7 +2,7 @@ module github.com/yisar/snel
 
 go 1.22.0
 
-require github.com/matthewmueller/diff v0.0.2
+require github.com/matthewmueller/diff v0.0.3
 
 require (
 	github.com/google/go-cmp v0.5.6 // indirect

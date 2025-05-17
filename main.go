@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	"github.com/matthewmueller/diff"
-	"github.com/yisar/snel"
+	jsx "github.com/yisar/snel"
 	"github.com/yisar/snel/ast"
 )
 
