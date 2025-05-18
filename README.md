@@ -11,9 +11,9 @@ function App() {
   return <>
     <button onClick={() => setCount(c => c + 1)}>
       <span>{count()}</span>
-        {doubleCount()}
-      </button>
-    </>
+      {doubleCount()}
+    </button>
+  </>
 }
 ```
 
