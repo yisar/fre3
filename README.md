@@ -23,8 +23,8 @@ import { createElement as $createElement, setProp as $setProp, insertNode as $in
 import { signal } from 'fre'
 
 function App() {
-  const count = signal(0);
-  const doubleCount = computed(count * 2);
+  const count = signal(0)
+  const doubleCount = computed(count * 2)
   return (() => {
     var $el1 = $createElement("button");
     $setProp($el1, "onClick", () => setCount((c) => c + 1));
