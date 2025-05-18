@@ -7,7 +7,7 @@ import { signal } from 'fre'
 
 function Counter() {
   const count = signal(0)
-  const doubleCount = computed(count * 2)
+  const doubleCount = computed(count() * 2)
   return <>
     <button onClick={() => setCount(c => c + 1)}>
       <span>{count()}</span>
@@ -24,7 +24,7 @@ import { signal } from 'fre'
 
 function Counter() {
   const count = signal(0)
-  const doubleCount = computed(count * 2)
+  const doubleCount = computed(count() * 2)
   return (() => {
     var $el1 = $createElement("button");
     $setProp($el1, "onClick", () => setCount((c) => c + 1));
