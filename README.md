@@ -6,9 +6,9 @@ input
 import { signal } from 'fre'
 
 function App() {
-	const count = signal(0)
-	const doubleCount = computed(count * 2)
-	return <>
+  const count = signal(0)
+  const doubleCount = computed(count * 2)
+  return <>
     <button onClick={() => setCount(c => c + 1)}>
       <span>{count()}</span>
         {doubleCount()}
