@@ -39,12 +39,8 @@ func (p *Printer) VisitComment(c *ast.Comment) {
 }
 
 func (p *Printer) VisitField(f *ast.Field) {
-	fmt.Println(f.Value)
 	p.s.WriteString(jsx.SetProp(p.id, f.Name, f.Value.String()))
 	p.s.WriteString("\n")
-	// p.s.WriteString(f.Name)
-	// p.s.WriteString("=")
-	// f.Value.Visit(p)
 }
 
 func (p *Printer) VisitStringValue(s *ast.StringValue) {
@@ -64,19 +60,18 @@ func (p *Printer) VisitBoolValue(b *ast.BoolValue) {
 }
 
 func (p *Printer) VisitElement(e *ast.Element) {
+	pid:=p.pid
 
 	if e.Name == ""{
 		for _, child := range e.Children {
-			child.Visit(p)
+				child.Visit(p)
 		}
 		return
 	}
 	p.id++ //1
-	root:=false
 
-	if p.pid == 0{
+	if pid == 0{
 		p.s.WriteString("(() => {\n")
-		root = true
 	}
 	p.s.WriteString("var ")
 	p.s.WriteString(jsx.GetElement(p.id))
@@ -92,8 +87,6 @@ func (p *Printer) VisitElement(e *ast.Element) {
 		}
 	}
 
-
-
 	if p.pid != 0{
 		p.s.WriteString(jsx.AppendChild(p.id, p.pid))
 	}
@@ -103,7 +96,7 @@ func (p *Printer) VisitElement(e *ast.Element) {
 		child.Visit(p)
 	}
 	
-	if root {
+	if pid == 0 {
 			p.s.WriteString("\n})();\n")
 	}
 
@@ -114,12 +107,16 @@ func (p *Printer) String() string {
 }
 
 func main() {
-	input := `export default () => <>
+	input := `function App() {
+	const count = signal(0)
+	const doubleCount = computed(count * 2)
+	return <>
       <button onClick={() => setCount(c => c + 1)}>
       <span>{count()}</span>
         {doubleCount()}
       </button>
-    </>`
+    </>
+	}`
 	ast, err := jsx.Parse("input.jsx", input)
 	
 	if err != nil{
