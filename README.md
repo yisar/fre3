@@ -2,8 +2,9 @@
 
 input
 
-```js
+```jsx
 import { signal } from 'fre'
+
 function App() {
 	const count = signal(0)
 	const doubleCount = computed(count * 2)
