@@ -8,7 +8,7 @@ function App() {
 	const count = signal(0)
 	const doubleCount = computed(count * 2)
 	return <>
-      <button onClick={() => setCount(c => c + 1)}>
+    <button onClick={() => setCount(c => c + 1)}>
       <span>{count()}</span>
         {doubleCount()}
       </button>
