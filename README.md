@@ -29,7 +29,7 @@ function Counter() {
     var $el1 = $createElement("button");
     $setProp($el1, "onClick", () => setCount((c) => c + 1));
     var $el2 = $createElement("span");
-    $insertNode($el2, $el1);
+    $insertNode($el1, $el2);
     $insertSignal($el2, count);
     $insertSignal($el2, doubleCount);
   })();
