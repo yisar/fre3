@@ -1,29 +1,26 @@
-# jsx
+# fre3
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/yisar/snel.svg)](https://pkg.go.dev/github.com/yisar/snel)
+input
 
-JSX parser for `.jsx` and `.tsx` files.
-
-This package is primarily used to rewrite JSX in JS files (think [styled-jsx](https://github.com/matthewmueller/styledjsx)). This package does not parse JS, rather it finds JSX within JS.
-
-## Install
-
-```sh
-go get github.com/yisar/snel
+```js
+export default () => <>
+      <button onClick={() => setCount(c => c + 1)}>
+      <span>{count()}</span>
+        {doubleCount()}
+      </button>
+    </>
 ```
 
-## Usage
+output
+```js
+import { createElement as $createElement, setProp as $setProp, insertNode as $insertNode, insertSignal as $insertSignal } from 'fre'
 
-```go
-input := `export default () => <h1>hello world</h1>`
-ast, _ := jsx.Parse("input.jsx", input)
-fmt.Println(ast.String())
+export default () => (() => {
+  var $el1 = $createElement("button");
+  $setProp($el1, "onClick", () => setCount((c) => c + 1));
+  var $el2 = $createElement("span");
+  $insertNode($el2, $el1);
+  $insertSignal($el2, count);
+  $insertSignal($el2, doubleCount);
+})();
 ```
-
-## Contributors
-
-- Matt Mueller ([@mattmueller](https://twitter.com/mattmueller))
-
-## License
-
-MIT

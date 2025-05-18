@@ -10,6 +10,7 @@ import (
 
 type Printer struct {
 	s strings.Builder
+	pid int
 	id int
 }
 
@@ -18,11 +19,19 @@ var _ ast.Visitor = (*Printer)(nil)
 func (p *Printer) VisitScript(s *ast.Script) {
 	for _, fragment := range s.Body {
 		fragment.Visit(p)
+
 	}
 }
 
 func (p *Printer) VisitText(t *ast.Text) {
-	p.s.WriteString(t.Value)
+	if jsx.IsFunction(t.Value) {
+		//signal
+		p.s.WriteString(jsx.InsertSignal(p.pid,t.Value))
+		
+	}else{
+		p.s.WriteString(t.Value)
+	}
+	
 }
 
 func (p *Printer) VisitComment(c *ast.Comment) {
@@ -30,6 +39,7 @@ func (p *Printer) VisitComment(c *ast.Comment) {
 }
 
 func (p *Printer) VisitField(f *ast.Field) {
+	fmt.Println(f.Value)
 	p.s.WriteString(jsx.SetProp(p.id, f.Name, f.Value.String()))
 	p.s.WriteString("\n")
 	// p.s.WriteString(f.Name)
@@ -42,11 +52,11 @@ func (p *Printer) VisitStringValue(s *ast.StringValue) {
 }
 
 func (p *Printer) VisitExpr(e *ast.Expr) {
-	p.s.WriteString("{")
+	// p.s.WriteString("{")
 	for _, frag := range e.Fragments {
 		frag.Visit(p)
 	}
-	p.s.WriteString("}")
+	// p.s.WriteString("}")
 }
 
 func (p *Printer) VisitBoolValue(b *ast.BoolValue) {
@@ -54,6 +64,20 @@ func (p *Printer) VisitBoolValue(b *ast.BoolValue) {
 }
 
 func (p *Printer) VisitElement(e *ast.Element) {
+
+	if e.Name == ""{
+		for _, child := range e.Children {
+			child.Visit(p)
+		}
+		return
+	}
+	p.id++ //1
+	root:=false
+
+	if p.pid == 0{
+		p.s.WriteString("(() => {\n")
+		root = true
+	}
 	p.s.WriteString("var ")
 	p.s.WriteString(jsx.GetElement(p.id))
 	p.s.WriteString(" = ")
@@ -68,12 +92,19 @@ func (p *Printer) VisitElement(e *ast.Element) {
 		}
 	}
 
-	p.id++
+
+
+	if p.pid != 0{
+		p.s.WriteString(jsx.AppendChild(p.id, p.pid))
+	}
 
 	for _, child := range e.Children {
+		p.pid = p.id // 0
 		child.Visit(p)
-		// insertNode
-		
+	}
+	
+	if root {
+			p.s.WriteString("\n})();\n")
 	}
 
 }
@@ -83,15 +114,20 @@ func (p *Printer) String() string {
 }
 
 func main() {
-	input := `export default () => <style scoped><Head/>{"body { background: blue }"}</style>`
-	script, err := jsx.Parse("input.jsx", input)
-
+	input := `export default () => <>
+      <button onClick={() => setCount(c => c + 1)}>
+      <span>{count()}</span>
+        {doubleCount()}
+      </button>
+    </>`
+	ast, err := jsx.Parse("input.jsx", input)
+	
 	if err != nil{
 		fmt.Println(err)
 	}
 
 	printer := &Printer{}
-	script.Visit(printer)
+	ast.Visit(printer)
 	actual := printer.String()
 	fmt.Println(actual)
 }
