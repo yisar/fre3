@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	// "encoding/json"
 	jsx "github.com/yisar/snel/jsx"
 	ast "github.com/yisar/snel/ast"
 )
@@ -24,11 +25,12 @@ func (p *Printer) VisitScript(s *ast.Script) {
 }
 
 func (p *Printer) VisitText(t *ast.Text) {
+	
 	if jsx.IsFunction(t.Value) {
 		//signal
 		p.s.WriteString(jsx.InsertSignal(p.pid,t.Value))
 		
-	}else{
+	}else if jsx.IsWhiteSpace(t.Value){}else{
 		p.s.WriteString(t.Value)
 	}
 	
@@ -40,7 +42,6 @@ func (p *Printer) VisitComment(c *ast.Comment) {
 
 func (p *Printer) VisitField(f *ast.Field) {
 	p.s.WriteString(jsx.SetProp(p.id, f.Name, f.Value.String()))
-	p.s.WriteString("\n")
 }
 
 func (p *Printer) VisitStringValue(s *ast.StringValue) {
@@ -62,22 +63,23 @@ func (p *Printer) VisitBoolValue(b *ast.BoolValue) {
 func (p *Printer) VisitElement(e *ast.Element) {
 	pid:=p.pid
 
-	if e.Name == ""{
+	if e.Name == ""{ // fragment
+		// data, _ := json.MarshalIndent(e.Children, "", "  ")
+		// 	fmt.Print(string(data))
 		for _, child := range e.Children {
-				child.Visit(p)
+			child.Visit(p)
 		}
 		return
 	}
 	p.id++ //1
 
 	if pid == 0{
-		p.s.WriteString("(() => {\n")
+		p.s.WriteString("(() => {")
 	}
 	p.s.WriteString("var ")
 	p.s.WriteString(jsx.GetElement(p.id))
 	p.s.WriteString(" = ")
 	p.s.WriteString(jsx.CreateElement(e.Name))
-	p.s.WriteString("\n")
 	if len(e.Attrs) > 0 {
 		for i, attr := range e.Attrs {
 			if i > 0 {
@@ -97,7 +99,7 @@ func (p *Printer) VisitElement(e *ast.Element) {
 	}
 	
 	if pid == 0 {
-			p.s.WriteString("\n})();\n")
+			p.s.WriteString("})();")
 	}
 
 }
@@ -108,15 +110,15 @@ func (p *Printer) String() string {
 
 func main() {
 	input := `function App() {
-	const count = signal(0)
-	const doubleCount = computed(count * 2)
-	return <>
-      <button onClick={() => setCount(c => c + 1)}>
+  const count = signal(0)
+  const doubleCount = computed(count * 2)
+  return <>
+    <button onClick={() => setCount(c => c + 1)}>
       <span>{count()}</span>
-        {doubleCount()}
-      </button>
-    </>
-	}`
+      {doubleCount()}
+    </button>
+  </>
+}`
 	ast, err := jsx.Parse("input.jsx", input)
 	
 	if err != nil{

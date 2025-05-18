@@ -70,3 +70,13 @@ func IsExpr(s string) bool { // isSignal
 
     return s[0] == '{' && s[len(s)-1] == '}'
 }
+
+func IsWhiteSpace(s string) bool {
+	for _, r := range s {
+		// 检查每个字符：允许空格(ASCII 32)、回车(\r, ASCII 13)、换行(\n, ASCII 10)
+		if r != ' ' && r != '\r' && r != '\n' {
+			return false
+		}
+	}
+	return true
+}
