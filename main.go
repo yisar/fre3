@@ -8,19 +8,9 @@ import (
 	ast "github.com/yisar/snel/ast"
 )
 
-func ExampleParse() {
-	input := `export default () => <h1>hello world</h1>`
-	ast, err := jsx.Parse("input.jsx", input)
-	if err != nil {
-		fmt.Println(err)
-	}
-	fmt.Println(ast.String())
-	// Output:
-	// export default () => <h1>hello world</h1>
-}
-
 type Printer struct {
 	s strings.Builder
+	id int
 }
 
 var _ ast.Visitor = (*Printer)(nil)
@@ -40,9 +30,11 @@ func (p *Printer) VisitComment(c *ast.Comment) {
 }
 
 func (p *Printer) VisitField(f *ast.Field) {
-	p.s.WriteString(f.Name)
-	p.s.WriteString("=")
-	f.Value.Visit(p)
+	p.s.WriteString(jsx.SetProp(p.id, f.Name, f.Value.String()))
+	p.s.WriteString("\n")
+	// p.s.WriteString(f.Name)
+	// p.s.WriteString("=")
+	// f.Value.Visit(p)
 }
 
 func (p *Printer) VisitStringValue(s *ast.StringValue) {
@@ -62,10 +54,12 @@ func (p *Printer) VisitBoolValue(b *ast.BoolValue) {
 }
 
 func (p *Printer) VisitElement(e *ast.Element) {
-	p.s.WriteString("<")
-	p.s.WriteString(e.Name)
+	p.s.WriteString("var ")
+	p.s.WriteString(jsx.GetElement(p.id))
+	p.s.WriteString(" = ")
+	p.s.WriteString(jsx.CreateElement(e.Name))
+	p.s.WriteString("\n")
 	if len(e.Attrs) > 0 {
-		p.s.WriteString(" ")
 		for i, attr := range e.Attrs {
 			if i > 0 {
 				p.s.WriteString(" ")
@@ -73,13 +67,15 @@ func (p *Printer) VisitElement(e *ast.Element) {
 			attr.Visit(p)
 		}
 	}
-	p.s.WriteString(">")
+
+	p.id++
+
 	for _, child := range e.Children {
 		child.Visit(p)
+		// insertNode
+		
 	}
-	p.s.WriteString("</")
-	p.s.WriteString(e.Name)
-	p.s.WriteString(">")
+
 }
 
 func (p *Printer) String() string {
@@ -87,8 +83,12 @@ func (p *Printer) String() string {
 }
 
 func main() {
-	input := `export default () => <style scoped>{"body { background: blue }"}</style>`
-	script, _ := jsx.Parse("input.jsx", input)
+	input := `export default () => <style scoped><Head/>{"body { background: blue }"}</style>`
+	script, err := jsx.Parse("input.jsx", input)
+
+	if err != nil{
+		fmt.Println(err)
+	}
 
 	printer := &Printer{}
 	script.Visit(printer)
