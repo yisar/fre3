@@ -5,7 +5,7 @@ input
 ```jsx
 import { signal } from 'fre'
 
-function App() {
+function Counter() {
   const count = signal(0)
   const doubleCount = computed(count * 2)
   return <>
@@ -22,7 +22,7 @@ output
 import { createElement as $createElement, setProp as $setProp, insertNode as $insertNode, insertSignal as $insertSignal } from 'fre'
 import { signal } from 'fre'
 
-function App() {
+function Counter() {
   const count = signal(0)
   const doubleCount = computed(count * 2)
   return (() => {
