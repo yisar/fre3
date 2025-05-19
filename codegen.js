@@ -304,3 +304,41 @@ const codeGen = (ctl, opts) => {
   return compileSegments(ctl, opts || {})
 };
 
+// since we're loading from <script> tags, pull out a few shorthand values
+var compile = SurplusCompiler.compile,
+    data = SurplusDataMixin.default,
+    SArray = SArray.default;
+
+var Todo = t => ({               // our Todo constructor
+       title: S.data(t.title),   // properties are data signals
+       done: S.data(t.done)
+    }),
+    todos = SArray([]),          // our array of todos
+    newTitle = S.data(""),       // title for new todos
+    addTodo = () => {            // push new title onto list
+        todos.push(Todo({ title: newTitle(), done: false }));
+        newTitle("");             // clear new title
+    },
+    // codepen can't preprocess code, so compile and eval here
+    view = eval(compile(`
+        <div>
+            <h3>Minimalist ToDos in Surplus</h3>
+            <input type="text" placeholder="enter todo and click +" fn={data(newTitle)}/>
+            <a onClick={addTodo}> + </a>
+            {todos.map(todo =>     
+                <div>
+                    <input type="checkbox" fn={data(todo.done)}/>
+                    <input type="text" fn={data(todo.title)}/>
+                    <a onClick={() => todos.remove(todo)}>&times;</a>
+                </div>)}
+       </div>
+    `));
+
+if (localStorage.todos) // load stored todos on start
+    todos(JSON.parse(localStorage.todos).map(Todo));
+S(() =>                 // store todos whenever they change
+    localStorage.todos = JSON.stringify(todos().map(t => 
+        ({ title: t.title(), done: t.done() }))
+    ));
+
+document.body.appendChild(view); // add view to document

@@ -109,11 +109,11 @@ func (p *Printer) String() string {
 }
 
 func main() {
-	input := `function App() {
+	input := `function Counter() {
   const count = signal(0)
-  const doubleCount = computed(count * 2)
+  const doubleCount = computed(count() * 2)
   return <>
-    <button onClick={() => setCount(c => c + 1)}>
+    <button onClick={() => setCount(count() + 1)}>
       <span>{count()}</span>
       {doubleCount()}
     </button>
