@@ -90,7 +90,7 @@ func (p *Printer) VisitElement(e *ast.Element) {
 	}
 
 	if p.pid != 0{
-		p.s.WriteString(jsx.AppendChild(p.id, p.pid))
+		p.s.WriteString(jsx.AppendChild(p.pid, p.id))
 	}
 
 	for _, child := range e.Children {
