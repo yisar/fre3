@@ -99,7 +99,7 @@ func (p *Printer) VisitElement(e *ast.Element) {
 	}
 	
 	if pid == 0 {
-			p.s.WriteString("})();")
+			p.s.WriteString("return $el1;})();")
 	}
 
 }

@@ -32,6 +32,7 @@ function Counter() {
     $insertNode($el1, $el2);
     $insertSignal($el2, count);
     $insertSignal($el2, doubleCount);
+    return $el1;
   })();
 }
 ```
