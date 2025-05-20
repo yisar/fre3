@@ -20,7 +20,7 @@ function Counter() {
   const doubleCount = computed(count() * 2);
   return (() => {
     var $el1 = $createElement("button");
-    $setProp($el1, "onClick", () => setCount(count() + 1));
+    $setProp($el1, "onClick", () => count(count() + 1));
     var $el2 = $createElement("span");
     $insertNode($el1, $el2);
     var $el3 = $createTextNode("hello");
