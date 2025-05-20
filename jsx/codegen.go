@@ -18,7 +18,9 @@ func CreateElement(tag string) string {
 func CreateTextNode(text string) string {
 	return `$createTextNode(` + text + `);`
 }
-
+func InsertContent(text string) string {
+	return `$insertContent(` + text + `);`
+}
 func AttributeValue(value string) string {
 	if IsExpr(value){
 		return value[1:len(value)-1]

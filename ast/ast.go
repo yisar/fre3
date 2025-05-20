@@ -26,7 +26,7 @@ var (
 )
 
 type Script struct {
-	Body []Fragment
+	Body []Segment
 }
 
 func (s *Script) String() string {
@@ -41,23 +41,23 @@ func (s *Script) Visit(v Visitor) {
 	v.VisitScript(s)
 }
 
-type Fragment interface {
+type Segment interface {
 	Node
-	fragment()
+	segment()
 }
 
 var (
-	_ Fragment = (*Text)(nil)
-	_ Fragment = (*Comment)(nil)
-	_ Fragment = (*Element)(nil)
-	_ Fragment = (*Expr)(nil)
+	_ Segment = (*Text)(nil)
+	_ Segment = (*Comment)(nil)
+	_ Segment = (*Element)(nil)
+	_ Segment = (*Expr)(nil)
 )
 
 type Text struct {
 	Value string
 }
 
-func (r *Text) fragment() {}
+func (r *Text) segment() {}
 
 func (r *Text) String() string {
 	return r.Value
@@ -71,7 +71,7 @@ type Comment struct {
 	Value string
 }
 
-func (c *Comment) fragment() {}
+func (c *Comment) segment() {}
 
 func (c *Comment) String() string {
 	return "/*" + c.Value + "*/"
@@ -141,17 +141,17 @@ func (s *StringValue) Visit(v Visitor) {
 }
 
 type Expr struct {
-	Fragments []Fragment
+	Segments []Segment
 }
 
 func (e *Expr) attr()     {}
 func (e *Expr) value()    {}
-func (e *Expr) fragment() {}
+func (e *Expr) segment() {}
 
 func (e *Expr) String() string {
 	sb := new(strings.Builder)
 	sb.WriteString("{")
-	for _, f := range e.Fragments {
+	for _, f := range e.Segments {
 		sb.WriteString(f.String())
 	}
 	sb.WriteString("}")
@@ -179,11 +179,11 @@ func (b *BoolValue) Visit(v Visitor) {
 type Element struct {
 	Name        string
 	Attrs       []Attr
-	Children    []Fragment
+	Children    []Segment
 	SelfClosing bool
 }
 
-func (e *Element) fragment() {}
+func (e *Element) segment() {}
 
 func (e *Element) Type() string { return "Element" }
 

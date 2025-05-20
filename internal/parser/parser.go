@@ -102,20 +102,20 @@ func (p *Parser) unexpected(prefix string) error {
 }
 
 func (p *Parser) parseScript() (*ast.Script, error) {
-	var body []ast.Fragment
+	var body []ast.Segment
 	for !p.Accept(token.EOF) {
-		fragment, err := p.parseFragment()
+		segment, err := p.parseSegment()
 		if err != nil {
 			return nil, err
 		}
-		body = append(body, fragment)
+		body = append(body, segment)
 	}
 	return &ast.Script{
 		Body: body,
 	}, nil
 }
 
-func (p *Parser) parseFragment() (ast.Fragment, error) {
+func (p *Parser) parseSegment() (ast.Segment, error) {
 	switch {
 	case p.Accept(token.Text), p.Accept(token.Space):
 		return p.parseText()
@@ -124,7 +124,7 @@ func (p *Parser) parseFragment() (ast.Fragment, error) {
 	case p.Accept(token.OpenCurly):
 		return p.parseExpr()
 	default:
-		return nil, p.unexpected("fragment")
+		return nil, p.unexpected("segment")
 	}
 }
 
@@ -134,7 +134,7 @@ func (p *Parser) parseText() (*ast.Text, error) {
 	}, nil
 }
 
-func (p *Parser) parseElement() (ast.Fragment, error) {
+func (p *Parser) parseElement() (ast.Segment, error) {
 	for p.Accept(token.Space) {
 	}
 	// Sometimes < are false positives (typically when there are generics or less than signs)
@@ -146,7 +146,7 @@ func (p *Parser) parseElement() (ast.Fragment, error) {
 	for p.Accept(token.Space) {
 	}
 	if p.Accept(token.GreaterThan) {
-		return p.parseJSXFragment()
+		return p.parseJSXSegment()
 	}
 	if err := p.Expect(token.Identifier); err != nil {
 		return nil, err
@@ -183,7 +183,7 @@ func (p *Parser) parseElement() (ast.Fragment, error) {
 
 	// Children
 	for !p.Accept(token.LessThanSlash) {
-		child, err := p.parseFragment()
+		child, err := p.parseSegment()
 		if err != nil {
 			return nil, err
 		}
@@ -203,13 +203,13 @@ func (p *Parser) parseElement() (ast.Fragment, error) {
 	return node, nil
 }
 
-func (p *Parser) parseJSXFragment() (*ast.Element, error) {
+func (p *Parser) parseJSXSegment() (*ast.Element, error) {
 	node := &ast.Element{
 		Name: "",
 	}
 	// Children
 	for !p.Accept(token.LessThanSlash) {
-		child, err := p.parseFragment()
+		child, err := p.parseSegment()
 		if err != nil {
 			return nil, err
 		}
@@ -289,7 +289,7 @@ func unquote(s string) string {
 }
 
 func (p *Parser) parseExpr() (*ast.Expr, error) {
-	var frags []ast.Fragment
+	var frags []ast.Segment
 	for {
 		switch {
 		case p.Accept(token.Expr):
@@ -308,7 +308,7 @@ func (p *Parser) parseExpr() (*ast.Expr, error) {
 			})
 		case p.Accept(token.CloseCurly):
 			return &ast.Expr{
-				Fragments: frags,
+				Segments: frags,
 			}, nil
 		default:
 			return nil, p.unexpected("expr")

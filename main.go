@@ -4,40 +4,42 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+
 	// "encoding/json"
-	jsx "github.com/yisar/snel/jsx"
 	ast "github.com/yisar/snel/ast"
+	jsx "github.com/yisar/snel/jsx"
 )
 
 type Printer struct {
-	s strings.Builder
-	pid int
-	id int
+	s     strings.Builder
+	pid   int
+	id    int
 	isjsx bool
 }
 
 var _ ast.Visitor = (*Printer)(nil)
 
 func (p *Printer) VisitScript(s *ast.Script) {
-	for _, fragment := range s.Body {
-		fragment.Visit(p)
+	for _, segment := range s.Body {
+		segment.Visit(p)
 	}
 }
 
 func (p *Printer) VisitText(t *ast.Text) {
-	if jsx.IsWhiteSpace(t.Value){}else	if jsx.IsFunction(t.Value) {
+	if jsx.IsWhiteSpace(t.Value) {
+	} else if jsx.IsFunction(t.Value) {
 		//signal
-		p.s.WriteString(jsx.InsertSignal(p.pid,t.Value))
-		
-	}else if p.isjsx{
+		p.s.WriteString(jsx.InsertSignal(p.pid, t.Value))
+
+	} else if p.isjsx {
 		p.pid = p.id
 		p.id++
 		p.s.WriteString(`var `)
 		p.s.WriteString(jsx.GetElement(p.id))
 		p.s.WriteString(` = `)
-		p.s.WriteString(jsx.CreateTextNode(`"`+t.Value+`"`))
+		p.s.WriteString(jsx.CreateTextNode(`"` + t.Value + `"`))
 		p.s.WriteString(jsx.AppendChild(p.pid, p.id))
-	} else{
+	} else {
 		p.s.WriteString(t.Value)
 	}
 }
@@ -56,7 +58,8 @@ func (p *Printer) VisitStringValue(s *ast.StringValue) {
 
 func (p *Printer) VisitExpr(e *ast.Expr) {
 	p.isjsx = false
-	for _, frag := range e.Fragments {
+	fmt.Println(e)
+	for _, frag := range e.Segments {
 		frag.Visit(p)
 	}
 }
@@ -66,12 +69,10 @@ func (p *Printer) VisitBoolValue(b *ast.BoolValue) {
 }
 
 func (p *Printer) VisitElement(e *ast.Element) {
-	pid:=p.pid
+	pid := p.pid
 	p.isjsx = true
 
-	if e.Name == ""{ // fragment
-		// data, _ := json.MarshalIndent(e.Children, "", "  ")
-		// 	fmt.Print(string(data))
+	if e.Name == "" { // segment
 		for _, child := range e.Children {
 			child.Visit(p)
 		}
@@ -79,7 +80,7 @@ func (p *Printer) VisitElement(e *ast.Element) {
 	}
 	p.id++ //1
 
-	if pid == 0{
+	if pid == 0 {
 		p.s.WriteString("(() => {")
 	}
 	p.s.WriteString("var ")
@@ -95,7 +96,7 @@ func (p *Printer) VisitElement(e *ast.Element) {
 		}
 	}
 
-	if p.pid != 0{
+	if p.pid != 0 {
 		p.s.WriteString(jsx.AppendChild(p.pid, p.id))
 	}
 
@@ -103,9 +104,9 @@ func (p *Printer) VisitElement(e *ast.Element) {
 		p.pid = p.id // 0
 		child.Visit(p)
 	}
-	
+
 	if pid == 0 {
-			p.s.WriteString("return $el1;})();")
+		p.s.WriteString("return $el1;})();")
 	}
 
 }
@@ -126,8 +127,8 @@ func main() {
   </>
 }`
 	ast, err := jsx.Parse("input.jsx", input)
-	
-	if err != nil{
+
+	if err != nil {
 		fmt.Println(err)
 	}
 

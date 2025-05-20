@@ -92,12 +92,12 @@ func TestSample(t *testing.T) {
 	equal(t, `hello <input type="text" /> world`, `hello <input type="text" /> world`)
 	equal(t, `hello <Planet>mars</Planet>`, `hello <Planet>mars</Planet>`)
 	equal(t, children, children)
-	equal(t, `hello <>fragment</>`, `hello <>fragment</>`)
+	equal(t, `hello <>segment</>`, `hello <>segment</>`)
 	equal(t, `hello <h2>Record<string,string></h2>`, `hello <h2>Record<string,string></h2>`)
 	equal(t, `type Record<string> = {}; function() { return <h2>hello world</h2> }`, `type Record<string> = {}; function() { return <h2>hello world</h2> }`)
 	equal(t, `type Record<string> = {}; function() { return (<h2>hello world</h2>) }`, `type Record<string> = {}; function() { return (<h2>hello world</h2>) }`)
 	equal(t, `function() { return (<h2 {...props}>{message}</h2>) }`, `function() { return (<h2 {...props}>{message}</h2>) }`)
-	equal(t, `<><React.Fragment><>hello world</></React.Fragment></>`, `<><React.Fragment><>hello world</></React.Fragment></>`)
+	equal(t, `<><React.Segment><>hello world</></React.Segment></>`, `<><React.Segment><>hello world</></React.Segment></>`)
 
 	equal(t, `hello <span data-x={<span>tag in attribute</span>}>world</span>`, `hello <span data-x={<span>tag in attribute</span>}>world</span>`)
 	equal(t, `hello <span data-x={window ? <span>content1</span> : <span>content2</span>}>world</span>`, `hello <span data-x={window ? <span>content1</span> : <span>content2</span>}>world</span>`)
@@ -115,7 +115,7 @@ func TestSample(t *testing.T) {
 
 func TestStyle(t *testing.T) {
 	equalAST(t, `export default () => <style scoped>{`+"`"+`h1 { background-color: lightblue; }`+"`"+`}</style>`,
-		&ast.Script{Body: []ast.Fragment{
+		&ast.Script{Body: []ast.Segment{
 			&ast.Text{Value: "export default () => "},
 			&ast.Element{
 				Name: "style",
@@ -127,8 +127,8 @@ func TestStyle(t *testing.T) {
 						},
 					},
 				},
-				Children: []ast.Fragment{&ast.Expr{
-					Fragments: []ast.Fragment{
+				Children: []ast.Segment{&ast.Expr{
+					Segments: []ast.Segment{
 						&ast.Text{Value: "`h1 { background-color: lightblue; }`"},
 					}},
 				},
@@ -140,20 +140,20 @@ func TestStyle(t *testing.T) {
 func TestMultiLineExpr(t *testing.T) {
 	equalAST(t, `<h1 class={
 		"hello"
-	}>hi</h1>`, &ast.Script{Body: []ast.Fragment{
+	}>hi</h1>`, &ast.Script{Body: []ast.Segment{
 		&ast.Element{
 			Name: "h1",
 			Attrs: []ast.Attr{
 				&ast.Field{
 					Name: "class",
 					Value: &ast.Expr{
-						Fragments: []ast.Fragment{
+						Segments: []ast.Segment{
 							&ast.Text{Value: "\n\t\t\"hello\"\n"},
 						},
 					},
 				},
 			},
-			Children: []ast.Fragment{&ast.Text{Value: "hi"}},
+			Children: []ast.Segment{&ast.Text{Value: "hi"}},
 		},
 	}})
 }
@@ -162,7 +162,7 @@ func TestInExpr(t *testing.T) {
 	equal(t, `export default function { return (<H1 func={() => <h1>hello world</h1>} />) }`, `export default function { return (<H1 func={() => <h1>hello world</h1>} />) }`)
 	equal(t, `export default function { return (<H2 func={() => <Header>hello world</Header>} />) }`, `export default function { return (<H2 func={() => <Header>hello world</Header>} />) }`)
 	equal(t, `export default function () { return (<H2 func={<Header {...props}>hello <span>world</span></Header>}/>)}`, `export default function () { return (<H2 func={<Header {...props}>hello <span>world</span></Header>} />)}`)
-	equalAST(t, `export default function { return (<H1 func={() => <h1>hello world</h1>} />) }`, &ast.Script{Body: []ast.Fragment{
+	equalAST(t, `export default function { return (<H1 func={() => <h1>hello world</h1>} />) }`, &ast.Script{Body: []ast.Segment{
 		&ast.Text{Value: "export default function { return ("},
 		&ast.Element{
 			Name: "H1",
@@ -170,13 +170,13 @@ func TestInExpr(t *testing.T) {
 				&ast.Field{
 					Name: "func",
 					Value: &ast.Expr{
-						Fragments: []ast.Fragment{
+						Segments: []ast.Segment{
 							&ast.Text{
 								Value: "() => ",
 							},
 							&ast.Element{
 								Name: "h1",
-								Children: []ast.Fragment{
+								Children: []ast.Segment{
 									&ast.Text{
 										Value: "hello world",
 									},
@@ -192,7 +192,7 @@ func TestInExpr(t *testing.T) {
 			Value: ") }",
 		},
 	}})
-	equalAST(t, `export default function { return (<H2 func={() => <Header>hello world</Header>} />) }`, &ast.Script{Body: []ast.Fragment{
+	equalAST(t, `export default function { return (<H2 func={() => <Header>hello world</Header>} />) }`, &ast.Script{Body: []ast.Segment{
 		&ast.Text{Value: "export default function { return ("},
 		&ast.Element{
 			Name: "H2",
@@ -200,13 +200,13 @@ func TestInExpr(t *testing.T) {
 				&ast.Field{
 					Name: "func",
 					Value: &ast.Expr{
-						Fragments: []ast.Fragment{
+						Segments: []ast.Segment{
 							&ast.Text{
 								Value: "() => ",
 							},
 							&ast.Element{
 								Name: "Header",
-								Children: []ast.Fragment{
+								Children: []ast.Segment{
 									&ast.Text{
 										Value: "hello world",
 									},
@@ -243,7 +243,7 @@ func TestTSXFile(t *testing.T) {
 	equalFile(t, "10-privacy.jsx")
 	equalFile(t, "11-slack-button.jsx")
 	equalFile(t, "12-document.tsx")
-	equalFile(t, "13-inner-fragment.tsx")
+	equalFile(t, "13-inner-segment.tsx")
 }
 
 // These tests come from styled-jsx
@@ -269,11 +269,11 @@ func TestSyntaxError(t *testing.T) {
 }
 
 func TestIssue1(t *testing.T) {
-	equalAST(t, `<div>{h.components( [ { field: x => "(<><button>PUSH_ME</button></>)", label: "Actions"} ])}</div>`, &ast.Script{Body: []ast.Fragment{
+	equalAST(t, `<div>{h.components( [ { field: x => "(<><button>PUSH_ME</button></>)", label: "Actions"} ])}</div>`, &ast.Script{Body: []ast.Segment{
 		&ast.Element{
 			Name: "div",
-			Children: []ast.Fragment{
-				&ast.Expr{Fragments: []ast.Fragment{
+			Children: []ast.Segment{
+				&ast.Expr{Segments: []ast.Segment{
 					&ast.Text{Value: `h.components( [ { field: x => "(<><button>PUSH_ME</button></>)", label: "Actions"} ])`},
 				}},
 			},
@@ -283,7 +283,7 @@ func TestIssue1(t *testing.T) {
 
 func TestIssue2(t *testing.T) {
 	equal(t, `<div class='test'> </div>`, `<div class='test'> </div>`)
-	equalAST(t, `<div class='test'> </div>`, &ast.Script{Body: []ast.Fragment{
+	equalAST(t, `<div class='test'> </div>`, &ast.Script{Body: []ast.Segment{
 		&ast.Element{
 			Name: "div",
 			Attrs: []ast.Attr{
@@ -295,11 +295,11 @@ func TestIssue2(t *testing.T) {
 					},
 				},
 			},
-			Children: []ast.Fragment{&ast.Text{Value: " "}},
+			Children: []ast.Segment{&ast.Text{Value: " "}},
 		},
 	}})
 	equal(t, `<div class="child-width-1-2\@_m"> </div>`, `<div class="child-width-1-2\@_m"> </div>`)
-	equalAST(t, `<div class="child-width-1-2\@_m"> </div>`, &ast.Script{Body: []ast.Fragment{
+	equalAST(t, `<div class="child-width-1-2\@_m"> </div>`, &ast.Script{Body: []ast.Segment{
 		&ast.Element{
 			Name: "div",
 			Attrs: []ast.Attr{
@@ -311,7 +311,7 @@ func TestIssue2(t *testing.T) {
 					},
 				},
 			},
-			Children: []ast.Fragment{&ast.Text{Value: " "}},
+			Children: []ast.Segment{&ast.Text{Value: " "}},
 		},
 	}})
 }
