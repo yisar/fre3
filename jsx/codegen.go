@@ -16,7 +16,7 @@ func CreateElement(tag string) string {
 }
 
 func CreateTextNode(text string) string {
-	return `$createText(` + text + `);`
+	return `$createTextNode(` + text + `);`
 }
 
 func AttributeValue(value string) string {

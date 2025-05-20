@@ -13,6 +13,7 @@ type Printer struct {
 	s strings.Builder
 	pid int
 	id int
+	isjsx bool
 }
 
 var _ ast.Visitor = (*Printer)(nil)
@@ -20,20 +21,25 @@ var _ ast.Visitor = (*Printer)(nil)
 func (p *Printer) VisitScript(s *ast.Script) {
 	for _, fragment := range s.Body {
 		fragment.Visit(p)
-
 	}
 }
 
 func (p *Printer) VisitText(t *ast.Text) {
-	
-	if jsx.IsFunction(t.Value) {
+	if jsx.IsWhiteSpace(t.Value){}else	if jsx.IsFunction(t.Value) {
 		//signal
 		p.s.WriteString(jsx.InsertSignal(p.pid,t.Value))
 		
-	}else if jsx.IsWhiteSpace(t.Value){}else{
+	}else if p.isjsx{
+		p.pid = p.id
+		p.id++
+		p.s.WriteString(`var `)
+		p.s.WriteString(jsx.GetElement(p.id))
+		p.s.WriteString(` = `)
+		p.s.WriteString(jsx.CreateTextNode(`"`+t.Value+`"`))
+		p.s.WriteString(jsx.AppendChild(p.pid, p.id))
+	} else{
 		p.s.WriteString(t.Value)
 	}
-	
 }
 
 func (p *Printer) VisitComment(c *ast.Comment) {
@@ -49,11 +55,10 @@ func (p *Printer) VisitStringValue(s *ast.StringValue) {
 }
 
 func (p *Printer) VisitExpr(e *ast.Expr) {
-	// p.s.WriteString("{")
+	p.isjsx = false
 	for _, frag := range e.Fragments {
 		frag.Visit(p)
 	}
-	// p.s.WriteString("}")
 }
 
 func (p *Printer) VisitBoolValue(b *ast.BoolValue) {
@@ -62,6 +67,7 @@ func (p *Printer) VisitBoolValue(b *ast.BoolValue) {
 
 func (p *Printer) VisitElement(e *ast.Element) {
 	pid:=p.pid
+	p.isjsx = true
 
 	if e.Name == ""{ // fragment
 		// data, _ := json.MarshalIndent(e.Children, "", "  ")
@@ -114,8 +120,8 @@ func main() {
   const doubleCount = computed(count() * 2)
   return <>
     <button onClick={() => setCount(count() + 1)}>
-      <span>{count()}</span>
-      {doubleCount()}
+      <span>hello</span>
+      {word}
     </button>
   </>
 }`
