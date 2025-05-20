@@ -29,7 +29,7 @@ func (p *Printer) VisitText(t *ast.Text) {
 	if jsx.IsWhiteSpace(t.Value) {
 	} else if jsx.IsFunction(t.Value) { //signal
 		p.s.WriteString(jsx.InsertSignal(p.pid, t.Value))
-	} else if p.isExpr { // content
+	} else if p.isExpr { // expr content
 		p.s.WriteString(jsx.InsertContent(p.pid, t.Value))
 	} else if p.isJsx { // textnode
 		p.pid = p.id
@@ -39,7 +39,7 @@ func (p *Printer) VisitText(t *ast.Text) {
 		p.s.WriteString(` = `)
 		p.s.WriteString(jsx.CreateTextNode(`"` + t.Value + `"`))
 		p.s.WriteString(jsx.AppendChild(p.pid, p.id))
-	} else {
+	} else { // js text
 		p.s.WriteString(t.Value)
 	}
 }
@@ -125,7 +125,7 @@ func main() {
   const doubleCount = computed(count() * 2)
   return <>
     <button onClick={() => count(count() + 1)}>
-      <span>hello</span>
+      <span>{count()}</span>
       {word}
     </button>
   </>
