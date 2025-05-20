@@ -1,10 +1,8 @@
 # fre3
 
-input
 
 ```jsx
-import { signal } from 'fre'
-
+//input
 function Counter() {
   const count = signal(0)
   const doubleCount = computed(count() * 2)
@@ -15,13 +13,8 @@ function Counter() {
     </button>
   </>
 }
-```
 
-output
-```js
-import { createElement as $createElement, setProp as $setProp, insertNode as $insertNode, insertSignal as $insertSignal } from 'fre'
-import { signal } from 'fre'
-
+// output
 function Counter() {
   const count = signal(0);
   const doubleCount = computed(count() * 2);
