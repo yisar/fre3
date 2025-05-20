@@ -1,4 +1,5 @@
 package jsx
+
 import (
 	"strconv"
 )
@@ -18,14 +19,14 @@ func CreateElement(tag string) string {
 func CreateTextNode(text string) string {
 	return `$createTextNode(` + text + `);`
 }
-func InsertContent(text string) string {
-	return `$insertContent(` + text + `);`
+func InsertContent(refId int, text string) string {
+	return `$insertContent(` + GetElement(refId) + `,` + text + `);`
 }
 func AttributeValue(value string) string {
-	if IsExpr(value){
-		return value[1:len(value)-1]
-	}else{
-		return strconv.Quote(value[1:len(value)-1])
+	if IsExpr(value) {
+		return value[1 : len(value)-1]
+	} else {
+		return strconv.Quote(value[1 : len(value)-1])
 	}
 }
 
@@ -52,10 +53,6 @@ func RemoveChild(refId, parentId int) string {
 	return `$removeChild(` + GetElement(refId) + `,` + GetElement(parentId) + `);`
 }
 
-func InsertBefore(refId, nextId, parentId int) string {
-	return `$insertNode(` + GetElement(refId) + `,` + GetElement(nextId) + `,` + GetElement(parentId) + `);`
-}
-
 func IsComponent(elementType string) bool {
 	if len(elementType) == 0 {
 		return false
@@ -65,12 +62,12 @@ func IsComponent(elementType string) bool {
 }
 
 func IsFunction(s string) bool { // isSignal
-    return s[len(s)-2] == '(' && s[len(s)-1] == ')'
+	return s[len(s)-2] == '(' && s[len(s)-1] == ')'
 }
 
 func IsExpr(s string) bool { // isSignal
 
-    return s[0] == '{' && s[len(s)-1] == '}'
+	return s[0] == '{' && s[len(s)-1] == '}'
 }
 
 func IsWhiteSpace(s string) bool {

@@ -39,3 +39,4 @@ function Counter() {
 todo:
 1. jsx 部分可以不保留空格
 2. jsx 文字节点解析
+3. pid 算不准

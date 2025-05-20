@@ -5,16 +5,16 @@ import (
 	"strconv"
 	"strings"
 
-	// "encoding/json"
 	ast "github.com/yisar/snel/ast"
 	jsx "github.com/yisar/snel/jsx"
 )
 
 type Printer struct {
-	s     strings.Builder
-	pid   int
-	id    int
-	isjsx bool
+	s      strings.Builder
+	pid    int
+	id     int
+	isJsx  bool
+	isExpr bool
 }
 
 var _ ast.Visitor = (*Printer)(nil)
@@ -27,11 +27,11 @@ func (p *Printer) VisitScript(s *ast.Script) {
 
 func (p *Printer) VisitText(t *ast.Text) {
 	if jsx.IsWhiteSpace(t.Value) {
-	} else if jsx.IsFunction(t.Value) {
-		//signal
+	} else if jsx.IsFunction(t.Value) { //signal
 		p.s.WriteString(jsx.InsertSignal(p.pid, t.Value))
-
-	} else if p.isjsx {
+	} else if p.isExpr { // content
+		p.s.WriteString(jsx.InsertContent(p.pid,t.Value))
+	} else if p.isJsx { // textnode
 		p.pid = p.id
 		p.id++
 		p.s.WriteString(`var `)
@@ -57,11 +57,13 @@ func (p *Printer) VisitStringValue(s *ast.StringValue) {
 }
 
 func (p *Printer) VisitExpr(e *ast.Expr) {
-	p.isjsx = false
-	fmt.Println(e)
+	p.isExpr = true
+	// data, _ := json.MarshalIndent(e, "", "  ")
+	// fmt.Print(string(data))
 	for _, frag := range e.Segments {
 		frag.Visit(p)
 	}
+	p.isExpr = false
 }
 
 func (p *Printer) VisitBoolValue(b *ast.BoolValue) {
@@ -69,8 +71,8 @@ func (p *Printer) VisitBoolValue(b *ast.BoolValue) {
 }
 
 func (p *Printer) VisitElement(e *ast.Element) {
+
 	pid := p.pid
-	p.isjsx = true
 
 	if e.Name == "" { // segment
 		for _, child := range e.Children {
@@ -81,6 +83,7 @@ func (p *Printer) VisitElement(e *ast.Element) {
 	p.id++ //1
 
 	if pid == 0 {
+		p.isJsx = true
 		p.s.WriteString("(() => {")
 	}
 	p.s.WriteString("var ")
@@ -107,6 +110,7 @@ func (p *Printer) VisitElement(e *ast.Element) {
 
 	if pid == 0 {
 		p.s.WriteString("return $el1;})();")
+		p.isJsx = false
 	}
 
 }
