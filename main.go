@@ -30,7 +30,7 @@ func (p *Printer) VisitText(t *ast.Text) {
 	} else if jsx.IsFunction(t.Value) { //signal
 		p.s.WriteString(jsx.InsertSignal(p.pid, t.Value))
 	} else if p.isExpr { // content
-		p.s.WriteString(jsx.InsertContent(p.pid,t.Value))
+		p.s.WriteString(jsx.InsertContent(p.pid, t.Value))
 	} else if p.isJsx { // textnode
 		p.pid = p.id
 		p.id++
@@ -71,21 +71,21 @@ func (p *Printer) VisitBoolValue(b *ast.BoolValue) {
 }
 
 func (p *Printer) VisitElement(e *ast.Element) {
-
-	pid := p.pid
-
 	if e.Name == "" { // segment
 		for _, child := range e.Children {
 			child.Visit(p)
 		}
 		return
 	}
-	p.id++ //1
-
+	pid := p.pid
 	if pid == 0 {
 		p.isJsx = true
 		p.s.WriteString("(() => {")
 	}
+	p.id++
+	id := p.id
+
+
 	p.s.WriteString("var ")
 	p.s.WriteString(jsx.GetElement(p.id))
 	p.s.WriteString(" = ")
@@ -104,7 +104,7 @@ func (p *Printer) VisitElement(e *ast.Element) {
 	}
 
 	for _, child := range e.Children {
-		p.pid = p.id // 0
+		p.pid = id
 		child.Visit(p)
 	}
 
@@ -124,7 +124,7 @@ func main() {
   const count = signal(0)
   const doubleCount = computed(count() * 2)
   return <>
-    <button onClick={() => setCount(count() + 1)}>
+    <button onClick={() => count(count() + 1)}>
       <span>hello</span>
       {word}
     </button>
