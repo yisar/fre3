@@ -7,8 +7,8 @@ import (
 	"testing"
 
 	"github.com/matthewmueller/diff"
-	"github.com/yisar/snel"
-	"github.com/yisar/snel/ast"
+	"github.com/yisar/fre3"
+	"github.com/yisar/fre3/ast"
 )
 
 func ExampleParse() {

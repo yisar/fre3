@@ -3,9 +3,9 @@ package jsx
 import (
 	"fmt"
 
-	"github.com/yisar/snel/ast"
-	"github.com/yisar/snel/internal/lexer"
-	"github.com/yisar/snel/internal/parser"
+	"github.com/yisar/fre3/ast"
+	"github.com/yisar/fre3/internal/lexer"
+	"github.com/yisar/fre3/internal/parser"
 )
 
 // Parse a .jsx or .tsx file and return an AST

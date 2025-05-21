@@ -5,8 +5,8 @@ import (
 	"strconv"
 	"strings"
 
-	ast "github.com/yisar/snel/ast"
-	jsx "github.com/yisar/snel/jsx"
+	ast "github.com/yisar/f re/ast"
+	jsx "github.com/yisar/fre3/jsx"
 )
 
 type Printer struct {

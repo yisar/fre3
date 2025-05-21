@@ -1,4 +1,4 @@
-module github.com/yisar/snel
+module github.com/yisar/fre3
 
 go 1.22.0
 

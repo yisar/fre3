@@ -1,5 +1,5 @@
 {
-  "name": "snel",
+  "name": "fre3",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -8,15 +8,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/yisar/snel.git"
+    "url": "git+https://github.com/yisar/fre3.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/yisar/snel/issues"
+    "url": "https://github.com/yisar/fre3/issues"
   },
-  "homepage": "https://github.com/yisar/snel#readme",
+  "homepage": "https://github.com/yisar/fre3#readme",
   "dependencies": {
   }
 }

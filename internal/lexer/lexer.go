@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 	"unicode/utf8"
-	"github.com/yisar/snel/internal/token"
+	"github.com/yisar/fre3/internal/token"
 )
 
 type state = func(l *Lexer) token.Type
